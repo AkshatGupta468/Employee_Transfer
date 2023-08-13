@@ -9,9 +9,15 @@
   "author": "Akshat Gupta",
   "license": "ISC",
   "dependencies": {
+    "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/mongoose": "^5.11.97",
+    "@types/validator": "^13.11.1",
     "axios": "^1.4.0",
     "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "morgan": "^1.10.0",
     "puppeteer": "^20.8.2"
   },
   "devDependencies": {

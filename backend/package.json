@@ -14,11 +14,14 @@
     "@types/mongoose": "^5.11.97",
     "@types/validator": "^13.11.1",
     "axios": "^1.4.0",
+    "bcryptjs": "^2.4.3",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.1",
     "morgan": "^1.10.0",
-    "puppeteer": "^20.8.2"
+    "puppeteer": "^20.8.2",
+    "validator": "^13.11.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",

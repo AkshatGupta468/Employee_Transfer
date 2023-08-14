@@ -1,11 +1,10 @@
 // Create a basic express server
 // =============================================================
-var express = require("express");
-var app = express();
-const dotenv = require("dotenv");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 
+const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
+
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
   process.env.DATABASE_PASSWORD
@@ -19,10 +18,18 @@ mongoose
     console.log("Unable to Connect to Database", err);
   });
 
-const PORT = process.env.PORT || 3000;
-// Sets up the Express app to handle data parsing
-// Starts the server to begin listening
-// =============================================================
-app.listen(PORT, function () {
-  console.log("App listening on PORT " + PORT);
+const app = require("./app");
+
+const portNo = process.env.PORT || 3000;
+
+const server = app.listen(portNo, () => {
+  console.log(`App running on port ${portNo}...`);
+});
+process.on("unhandledRejection", (err) => {
+  console.log("UNHANDLED REJECTION! 💥 Shutting down...");
+  console.log(err);
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
 });

@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const { getAllJSDocTagsOfKind } = require("typescript");
-const sendEmail = require("./../utils/email");
+const Email = require("./../utils/email");
 const { castObject } = require("./../models/userModel");
 const crypto = require("crypto");
 
@@ -43,7 +43,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
-
+  const url = "http://www.google.com";
+  await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
 });
 
@@ -128,18 +129,14 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //Sending it to user's email
-  const resetURL = `${req.prtocol}://${req.get(
-    "host"
-  )}/api/v1/users/reserPassword/${resetToken}`;
-
-  const message = `Forgot your password? Submit a PATCH request with your new Password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email.`;
   try {
-    await sendEmail({
-      email: user.email,
-      subject: "Your password reset token (valid for 10 minutes) ",
-      message,
-    });
+    const resetURL = `${req.prtocol}://${req.get(
+      "host"
+    )}/api/v1/users/reserPassword/${resetToken}`;
 
+    const message = `Forgot your password? Submit a PATCH request with your new Password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email.`;
+
+    await new Email(user, resetURL).sendPasswordReset();
     res.status(200).json({
       status: "success",
       message: "message sent to email",

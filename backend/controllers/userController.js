@@ -10,23 +10,16 @@ const filterObj = (obj, ...allowedFields) => {
   });
 };
 
-exports.getDetails = async (req, res) => {
-  try {
-    const user = new Users.findById(req.params.id);
+exports.getDetails = catchAsync(async (req, res) => {
+  const user = await Users.findById(req.user.id);
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        user,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: err,
-    });
-  }
-};
+  res.status(200).json({
+    status: "success",
+    data: {
+      user,
+    },
+  });
+});
 exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(

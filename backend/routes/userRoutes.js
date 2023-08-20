@@ -5,6 +5,14 @@ const userRouter = express.Router();
 
 userRouter.post("/signup", authController.signup);
 userRouter.post("/login", authController.login);
+userRouter.post("/forgotPassword", authController.forgotPassword);
+userRouter.patch("/resetPassword/:token", authController.resetPassword);
+
+userRouter.patch(
+  "/updatePassword",
+  authController.protect,
+  authController.updatePassword
+);
 
 userRouter
   .route("/profile")
@@ -13,6 +21,10 @@ userRouter
 
 userRouter
   .route("/allUsers")
-  .get(authController.protect, userController.getAllUsers);
+  .get(
+    authController.protect,
+    authController.restrictTo("admin"),
+    userController.getAllUsers
+  );
 
 module.exports = userRouter;

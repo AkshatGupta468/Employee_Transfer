@@ -4,7 +4,7 @@
   "description": "A Platform to Connect Employees from different Localities to help them for doing Transfer",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:dev": "nodemon server.js"
   },
   "author": "Akshat Gupta",
   "license": "ISC",
@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
+    "prettier": "^3.0.2",
     "typescript": "^5.1.6"
   }
 }

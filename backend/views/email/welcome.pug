@@ -1,0 +1,17 @@
+extends baseEmail
+
+block content
+  p Hi #{firstName},
+  p Welcome to the Employee Transfer portal, we're glad to have you 🎉🙏
+  p To begin searching for a potential vacancy at your desired location, please update your profile.
+  table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
+    tbody
+      tr
+        td(align='left')
+          table(role='presentation', border='0', cellpadding='0', cellspacing='0')
+            tbody
+              tr
+                td
+                  a(href=`${url}`, target='_blank') Update Profile
+  p If you need any help with the app, please don't hesitate to contact me!
+  p - Shikhar Agrawal

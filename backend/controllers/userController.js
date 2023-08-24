@@ -24,9 +24,12 @@ exports.getDetails = catchAsync(async (req, res) => {
 exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(
-      new AppError(
-        "This route is not for password update. Please use updatePassword route",
-        400
+      new AppError(400, {
+        misc: {
+          name: 'WRONG ROUTE',
+          message: "This route is not for password update. Please use updatePassword route"
+        }
+      }
       )
     );
   }

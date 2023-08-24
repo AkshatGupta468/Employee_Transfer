@@ -51,14 +51,38 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body
   //checking if email and password exist
-  if (!email || !password) {
-    return next(new AppError("Please provide email and password", 400))
+  if (!email) {
+    return next(new AppError(400, {
+      email: {
+        name: 'REQ_EMAIL',
+        message: "Please provide an email id."
+      }
+    }
+      ))
+  }
+  if (!password) {
+    return next(new AppError(400, {
+      password: {
+        name: 'REQ_PASSWORD',
+        message: "Please provide a password."
+      }
+    }
+      ))
   }
 
   //checking if user exists and password is correct
   const user = await User.findOne({ email }).select("+password")
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError("Incorrect email or password", 401));
+    return next(new AppError(401, {
+      email: {
+        name: 'INVALID_EMAIL_PASSWORD',
+        message: "Incorrect email or password"
+      },
+      password: {
+        name: 'INVALID_EMAIL_PASSWORD',
+        message: "Incorrect email or password"
+      }
+    }));
   }
   //If everythimg is OK, send the token to client
   createSendToken(user, 200, res)
@@ -75,7 +99,12 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   if (!token) {
     return next(
-      new AppError("You are not loggen in. Please log in to get access", 401)
+      new AppError(401, {
+        misc: {
+          name: 'NOT_LOGGED_IN',
+          message:"You are not loggen in. Please log in to get access"
+        }
+      })
     )
   }
 
@@ -87,14 +116,24 @@ exports.protect = catchAsync(async (req, res, next) => {
   const freshUser = await User.findById(decoded.id)
   if (!freshUser) {
     return next(
-      new AppError("The user belonging to this token no longer exists", 401)
+      new AppError(401, {
+        misc: {
+          name: 'USER_DELETED',
+          message: 'The user belonging to the token no longer exists',
+        },
+      })
     )
   }
 
   //checking if the user has changed the password after token was created
   if (freshUser.changedPasswordAfter(decoded.iat)) {
     return next(
-      new AppError("User recently changed password, please login again", 401)
+      new AppError(401, {
+        misc: {
+          name: 'USER_PASSWORD_CHANGED',
+          message: 'User recently changed password! Please log in again.',
+        },
+      })
     )
   }
   //if everything's fine, granting access to the protected route
@@ -106,10 +145,12 @@ exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
-        new AppError(
-          "You do not have the permission to perform this action",
-          401
-        )
+         new AppError(403, {
+          misc: {
+            name: 'UNAUTHORIZED',
+            message: 'You do not have permission to perform this action',
+          },
+        })
       )
     }
     next()
@@ -122,7 +163,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   //Getting user based on the Posted Email
   const user = await User.findOne({ email: req.body.email })
   if (!user) {
-    return next(new AppError("There is no user email address", 404))
+    return next(new AppError(404, {
+        email: {
+          name: 'INVALID_EMAIL',
+          message: 'There is no user with that email address',
+        },
+      }))
   }
   //Generating a random reset token
   const resetToken = user.createPasswordResetToken()
@@ -147,7 +193,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     await user.save({ validateBeforeSave: false })
 
     return next(
-      new AppError("There was an error sending the email. Try again later", 500)
+     new AppError(500, {
+        email: {
+          name: 'MAIL_NOT_SENT',
+          message: 'There was a error sending mail',
+        },
+      })
     )
   }
 })
@@ -168,7 +219,12 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   //If the user exists and token is not expired, set the new password
   if (!user) {
-    return next(new AppError("Reset Token is either invalid or expired", 400))
+    return next(new AppError(400, {
+        misc: {
+          name: 'INVALID_TOKEN',
+          message: 'Token is invalid or has expired',
+        },
+      }))
   }
   user.password = req.body.password
   user.passwordConfirm = req.body.passwordConfirm
@@ -187,7 +243,12 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id).select("+password")
   //Check if the Posted current password is correct
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
-    return next(new AppError("Your current password is wrong", 401))
+    return next( new AppError(403, {
+        password: {
+          name: 'INVALID_PASSWORD',
+          message: 'The currenet password entered is incorrect',
+        },
+      }))
   }
   //If so, update the password
   user.password = req.body.password

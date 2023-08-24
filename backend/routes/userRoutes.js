@@ -21,6 +21,10 @@ userRouter
   .patch(userController.updateMe)
 
 userRouter
+  .route("/employees/:locations")
+  .get(authController.protect, userController.getEmployees);
+
+userRouter
   .route("/allUsers")
   .get(authController.restrictTo("admin"), userController.getAllUsers)
 

@@ -40,11 +40,13 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-  })
-  const url = "http://www.google.com"
-  await new Email(newUser, url).sendWelcome()
-  createSendToken(newUser, 201, res)
-})
+    location: req.body.location,
+    phone_number: req.body.phone_number,
+  });
+  const url = "http://www.google.com";
+  await new Email(newUser, url).sendWelcome();
+  createSendToken(newUser, 201, res);
+});
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body
@@ -56,7 +58,7 @@ exports.login = catchAsync(async (req, res, next) => {
   //checking if user exists and password is correct
   const user = await User.findOne({ email }).select("+password")
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError("Incorrect emial or password", 401))
+    return next(new AppError("Incorrect email or password", 401));
   }
   //If everythimg is OK, send the token to client
   createSendToken(user, 200, res)

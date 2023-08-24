@@ -46,6 +46,18 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getEmployees = catchAsync(async (req, res, next) => {
+  const users = await Users.find().where("location").in(req.params.locations);
+
+  res.status(200).json({
+    status: "success",
+    results: users.length,
+    data: {
+      users,
+    },
+  });
+});
+
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await Users.find();
 

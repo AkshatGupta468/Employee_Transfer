@@ -11,13 +11,10 @@
   "author": "Akshat Gupta",
   "license": "ISC",
   "dependencies": {
-    "@types/express": "^4.17.17",
-    "@types/jsonwebtoken": "^9.0.2",
-    "@types/mongoose": "^5.11.97",
-    "@types/validator": "^13.11.1",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.0.0-rc.12",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-mongo-sanitize": "^2.2.0",
@@ -31,11 +28,25 @@
     "nodemailer-mailjet-transport": "^1.0.4",
     "pug": "^3.0.2",
     "puppeteer": "^20.8.2",
+    "socket.io": "^4.7.2",
     "validator": "^13.11.0",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/mongoose": "^5.11.97",
+    "@types/validator": "^13.11.1",
+    "eslint": "^8.19.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.30.1",
     "nodemon": "^3.0.1",
+    "prettier": "^3.0.2",
     "typescript": "^5.1.6"
   }
 }

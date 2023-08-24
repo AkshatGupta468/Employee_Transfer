@@ -1,14 +1,14 @@
-const nodemailer = require("nodemailer");
-const pug = require("pug");
-const htmlToText = require("html-to-text");
-const mailjetTransport = require("nodemailer-mailjet-transport");
-const { getModeForUsageLocation } = require("typescript");
+const nodemailer = require("nodemailer")
+const pug = require("pug")
+const htmlToText = require("html-to-text")
+const mailjetTransport = require("nodemailer-mailjet-transport")
+const { getModeForUsageLocation } = require("typescript")
 module.exports = class Email {
   constructor(user, url) {
-    (this.to = user.email),
+    ;(this.to = user.email),
       (this.firstName = user.name.split(" ")[0]),
       (this.url = url),
-      (this.from = "Shikhar <${process.env.EMAIL_FROM}>");
+      (this.from = "Shikhar <${process.env.EMAIL_FROM}>")
   }
   newTransport() {
     if (process.env.NODE_ENV == "production") {
@@ -20,7 +20,7 @@ module.exports = class Email {
             apiSecret: process.env.MAILJET_API_SECRET,
           },
         })
-      );
+      )
     }
     //creating a transporter
     return nodemailer.createTransport({
@@ -30,7 +30,7 @@ module.exports = class Email {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
       },
-    });
+    })
   }
   //sending the mail
   async send(template, subject) {
@@ -39,8 +39,7 @@ module.exports = class Email {
       firstName: this.firstName,
       url: this.url,
       subject,
-    });
-    console.log(html);
+    })
     //Defining email options
     const mailOptions = {
       from: this.from,
@@ -48,23 +47,23 @@ module.exports = class Email {
       subject,
       html,
       text: htmlToText.fromString(html),
-    };
+    }
 
     //Creating a transport and sending mail
 
-    await this.newTransport().sendMail(mailOptions);
+    await this.newTransport().sendMail(mailOptions)
   }
 
   async sendWelcome() {
     await this.send(
       "welcome",
       "Thank you for registering on the Employee Transfer portal"
-    );
+    )
   }
   async sendPasswordReset() {
     await this.send(
       "passwordReset",
       "Your password reset token(valid only for 10 minutes)"
-    );
+    )
   }
-};
+}

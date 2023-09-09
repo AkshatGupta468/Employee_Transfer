@@ -1,18 +1,28 @@
 import React,{ProfilerProps, useState} from 'react';
 import { Text,View,StyleSheet,StatusBar,TextInput, Button, Pressable} from 'react-native';
-import { Feather } from '@expo/vector-icons'
+import { Feather} from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../utils/AppNavigator';
+import { StackActions } from '@react-navigation/native';
 
 type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;
 
 export default function SignInScreen({route,navigation}:SignInProps) {
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
+    console.log(navigation)
+
+    const popScreen=(screenName:string)=>{
+        navigation.dispatch(
+            StackActions.replace(screenName)
+          );
+    }
     
     const SignIn=()=>{
         console.log('Sign In');
+        popScreen('WithinAppNavigator');
+        navigation.navigate('WithinAppNavigator')
     }
     const forgotPassword=()=>{
         console.log('Forgot Password');
@@ -20,9 +30,10 @@ export default function SignInScreen({route,navigation}:SignInProps) {
     }
     const SignUp=()=>{
         console.log('Sign Up');
+        popScreen('SignUp');
         navigation.navigate('SignUp');
     }
-    console.log("I'm in SignIN")
+    console.log("I'm in SignIn")
     return(
         <View style={styles.container}>
             <View style={styles.roundIcon}>
@@ -35,11 +46,12 @@ export default function SignInScreen({route,navigation}:SignInProps) {
              autoComplete={'email'}
              style={styles.textInput}/>
             <TextInput onChangeText={setPassword}
-             placeholder='Password*'
-             autoFocus={true}
-             style={styles.textInput}/>
+            placeholder='Password*'
+            autoFocus={true}
+            secureTextEntry={true}
+            style={styles.textInput}/>
             <Pressable onPress={SignIn} style={styles.button}>
-                <Text style={styles.buttonText}>Sign In</Text>
+                <Text style={styles.buttonText}>Sign In</Text> 
             </Pressable>
             <View style={{alignItems:'center'}}>
                 <Text onPress={forgotPassword} style={[styles.linkText,{marginTop:20}]}>Forgot Password?</Text>
@@ -57,7 +69,6 @@ const styles=StyleSheet.create({
         flex:1,
         alignItems:'center',
         backgroundColor:'yellow',
-        height:StatusBar.currentHeight||0
     },
     roundIcon:{
         backgroundColor:'black',

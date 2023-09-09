@@ -6,64 +6,49 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../utils/AppNavigator';
 import { StackActions } from '@react-navigation/native';
 
-type SignUpScreenProps=NativeStackScreenProps<RootStackParamList,"SignUp">;
+type ChangePasswordScreenProps=NativeStackScreenProps<RootStackParamList,"ChangePassword">;
 
 
 
-export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
-    const [email,setEmail]=useState('');
-    const [password,setPassword]=useState('');
-    const [phoneNumber,setPhoneNumber]=useState('');
-    console.log("I'm in SignUp")
-    console.log(navigation)
+export default function ChangePasswordScreen({route,navigation}:ChangePasswordScreenProps) {
+    const [oldPassword,setOldPassword]=useState('');
+    const [newPassword,setNewPassword]=useState('');
+    const [confirmationPassword,setConfirmationPassword]=useState('');
+    console.log("I'm in ChangePasswordScreen")
     
     const popScreen=(screenName:string)=>{
         navigation.dispatch(
             StackActions.replace(screenName)
           );
     }
-
-    const SignIn=()=>{
-        console.log('Sign In');
-        popScreen('SignIn');
-        navigation.navigate("SignIn");
-    }
-    const forgotPassword=()=>{
-        console.log('Forgot Password');
-        navigation.navigate("ForgotPassword");
-    }
-    const SignUp=()=>{
-        console.log('Sign Up');
-        popScreen('WithinAppNavigator');
-        navigation.navigate('WithinAppNavigator');
+    const Change=()=>{
+        console.log('Change');
+        navigation.pop(1);
     }
     return(
         <View style={styles.container}>
             <View style={styles.roundIcon}>
                 <Feather name={'lock'} size={40} color={'white'} />    
             </View>     
-            <Text style={{fontSize:24,marginTop:20}}>Sign Up</Text>
-             <PhoneInput 
-             onChangePhoneNumber={setPhoneNumber}
-             initialCountry='in'
-             style={styles.textInput}/>
-            <TextInput onChangeText={setEmail}
-             placeholder='Email Address*'
-             autoFocus={true}
-             autoComplete={'email'}
-             style={styles.textInput}/>
-            <TextInput onChangeText={setPassword}
-             placeholder='Password*'
+            <Text style={{fontSize:24,marginTop:20}}>Change Password</Text>
+            <TextInput onChangeText={setOldPassword}
+             placeholder='Current Password*'
              autoFocus={true}
              secureTextEntry={true}
              style={styles.textInput}/>
-            <Pressable onPress={SignUp} style={styles.button}>
-                <Text style={styles.buttonText}>Sign Up</Text>
+            <TextInput onChangeText={setNewPassword}
+            placeholder='New Password*'
+            autoFocus={true}
+            secureTextEntry={true}
+            style={styles.textInput}/>
+            <TextInput onChangeText={setConfirmationPassword}
+            placeholder='Confirm New Password*'
+            autoFocus={true}
+            secureTextEntry={true}
+            style={styles.textInput}/>
+            <Pressable onPress={Change} style={styles.button}>
+                <Text style={styles.buttonText}>Change</Text>
             </Pressable>
-                <View style={{marginTop:50,flexDirection:'row'}}>
-                 <Text>Already have an account? </Text>
-                 <Text onPress={SignIn} style={styles.linkText}>Sign In</Text>
-                </View>
         </View>
     )
 }

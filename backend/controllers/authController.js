@@ -39,9 +39,9 @@ exports.login = catchAsync(async (req, res, next) => {
   //checking if user exists and password is correct
   const user = await User.findOne({ email }).select("+password");
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError("Incorrect emial or password", 401));
+    return next(new AppError("Incorrect email or password", 401));
   }
-  //If everythimg is OK, send the token to client
+  //If everything is OK, send the token to client
   const token = signToken(user._id);
   res.status(200).json({
     status: "success",
@@ -60,7 +60,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   if (!token) {
     return next(
-      new AppError("You are not loggen in. Please log in to get access", 401)
+      new AppError("You are not logged in. Please log in to get access", 401)
     );
   }
 

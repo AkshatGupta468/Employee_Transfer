@@ -5,6 +5,10 @@ import {  SelectList } from 'react-native-dropdown-select-list';
 import PhoneInput from "react-native-phone-input";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../utils/AppNavigator';
+import { getToken,saveToken,removeToken } from '../utils/TokenHandler';
+import { BACKEND_BASE_URL } from '@env';
+import axios from 'axios';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
 
 const data = [
     {key:'1',value:'Jammu & Kashmir'},
@@ -25,6 +29,32 @@ const data = [
     {key:'16',value:'H'},
   ];
 
+interface ProfileDataStructure{
+    name:string,
+    phoneNumber:string,
+    location:string
+}
+
+const getProfileDetails=async()=>{
+    const BACKEND_BASE_URL=`http://10.10.5.131:3000/api/v1/users`
+    let token=await getToken();
+        if(token===null){
+            //TODO navigation
+        }else{
+            axios.get(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`}})
+            .then(response=>{
+                console.log(response.data.data.user);
+                let userData=response.data.data.user
+                const profileData:ProfileDataStructure={name:userData.name,
+                phoneNumber:userData.phone_number,
+                location:userData.location}
+                Toast.show({type:'success',text1:'Recieved Profile Successfully',position:'bottom'})
+                return profileData
+            }).catch((error)=>{
+                console.log(error)
+            })
+        }    
+}
 
 export default function ProfileScreen(){
 
@@ -35,7 +65,26 @@ export default function ProfileScreen(){
     const [id,setId]=useState('');
     const [visible, setVisible] = useState(false);
 
-    const SaveProfile=()=>{}
+    const SaveProfile=async()=>{
+        const BACKEND_BASE_URL=`http://10.10.5.131:3000/api/v1/users`
+        let token=await getToken();
+        if(token===null){
+            //TODO:navigation
+        }else{
+            console.log("HERE")
+            axios.patch(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`},data:{
+                name:name,
+                phone_number:phoneNumber,
+                location:location
+            }})
+            .then(response=>{
+                console.log(response);
+                Toast.show({type:'success',text1:'Saved Profile Successfully',position:'bottom'})
+            }).catch((error)=>{
+                console.log(error)
+            })
+        }
+    }
     const deactivateAccount=()=>{}
     const changePassword=()=>{      
     }
@@ -67,6 +116,7 @@ export default function ProfileScreen(){
             <Pressable onPress={SaveProfile} style={styles.button}>
                 <Text style={styles.buttonText}>Save</Text> 
             </Pressable>
+            <Toast/>
             {shouldRender?
             <View style={{marginBottom:50}}>
                  <Text style={styles.linkText} onPress={deactivateAccount}>Deactivate Account</Text>

@@ -2,12 +2,29 @@ import React,{useState} from 'react';
 import { Text,View,StyleSheet,StatusBar,TextInput, Button, Pressable} from 'react-native';
 import { Feather } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
 
 export default function ForgotPasswordScreen(){
     console.log("I'm in Forgot Password");
     const [email,setEmail]=useState('');
+    const BACKEND_BASE_URL=`http://10.10.5.131:3000/api/v1/users`;
 
     const sendMail=(email:String)=>{
+        axios.post(`${BACKEND_BASE_URL}/forgotPassword`,{email})
+            .then(response=>{
+                console.log(response.data);
+            }).catch((error)=>{
+                let message:string
+                let errorData=error.response.data.errors;
+                if(errorData.hasOwnProperty("email")){
+                    message=errorData.email.message
+                }else{
+                    message='Unknown Error'
+                }
+                Toast.show({type:'error',text1:message,position:'bottom'})
+                console.log(message)
+            })
         console.log("Sending Mail to user...")
     };
 
@@ -27,6 +44,7 @@ export default function ForgotPasswordScreen(){
                 <Pressable onPress={()=>{sendMail(email)}} style={styles.button}>
                     <Text style={styles.buttonText}>Send</Text>
                 </Pressable>
+                <Toast/>
             </View>
     );
 }

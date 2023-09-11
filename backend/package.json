@@ -4,13 +4,9 @@
   "description": "A Platform to Connect Employees from different Localities to help them for doing Transfer",
   "main": "index.js",
   "scripts": {
-<<<<<<< HEAD
     "start": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
-=======
-    "start:dev": "nodemon server.js"
->>>>>>> clientSide
   },
   "author": "Akshat Gupta",
   "license": "ISC",

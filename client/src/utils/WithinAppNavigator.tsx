@@ -7,9 +7,10 @@ import { RootStackParamList } from './AppNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 
+type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigator">;
 
-export default function WithinAppNavigator(){
+export default function WithinAppNavigator({route,navigation}:TabsScreenProps){
     return (   
-          <Tabs />
+          <Tabs navigation={navigation} route={route}/>
       )
 }

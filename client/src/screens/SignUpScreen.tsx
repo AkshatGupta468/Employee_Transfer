@@ -8,6 +8,8 @@ import { StackActions } from '@react-navigation/native';
 import axios from 'axios';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import {  SelectList } from 'react-native-dropdown-select-list';
+import { getError } from '../utils/ErrorClassifier';
+import { BACKEND_BASE_URL } from '@env';
 
 type SignUpScreenProps=NativeStackScreenProps<RootStackParamList,"SignUp">;
 
@@ -56,8 +58,8 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
     const [location,setLocation]=useState('');
 
     
-    console.log("I'm in SignUp")
-    console.log(navigation)
+    // console.log("I'm in SignUp")
+    // console.log(navigation)
     
     const popScreen=(screenName:string)=>{
         navigation.dispatch(
@@ -74,7 +76,6 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
         console.log('Forgot Password');
         navigation.navigate("ForgotPassword");
     }
-    const BACKEND_BASE_URL=`http://10.10.5.131:3000/api/v1/users`;
     const SignUp=()=>{
         console.log('Sign Up');
         axios.post(`${BACKEND_BASE_URL}/signup`,{
@@ -87,27 +88,11 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
         })
         .then(response=>{
             console.log(response.data);
-            // popScreen('WithinAppNavigator');
-            // navigation.navigate('WithinAppNavigator');
+            popScreen('WithinAppNavigator');
+            navigation.navigate('WithinAppNavigator');
         }).catch((error)=>{
-            let message:string
             let errorData=error.response.data.errors;
-            console.log(error.response.data)
-            if(errorData.hasOwnProperty("name")){
-                message=errorData.name.message
-            }else if(errorData.hasOwnProperty("phone_number")){
-                message=errorData.phone_number.message
-            }else if(errorData.hasOwnProperty("email")){
-                message=errorData.email.message
-            }else if(errorData.hasOwnProperty("password")){
-                message=errorData.password.message
-            }else if(errorData.hasOwnProperty("passwordConfirm")){
-                message=errorData.passwordConfirm.message
-            }else if(errorData.hasOwnProperty("location")){
-                message=errorData.location.message
-            }else{
-                message="UNKNOWN ERROR!"
-            }
+            let {name,message}=getError(errorData)
             Toast.show({type:'error',text1:message,position:'bottom'})
             console.log(message)
         })

@@ -2,15 +2,21 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
 import AboutUsScreen from '../screens/AboutUsScreen';
+import SignInScreen from '../screens/SignInScreen';
+import SignUpScreen from '../screens/SignUpScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import ChooseUserScreen from '../screens/ChooseUserScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import {NativeStackScreenProps, createNativeStackNavigator} from '@react-navigation/native-stack';
 import { RootStackParamList } from '../utils/AppNavigator';
-import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 
 
 const Tab=createBottomTabNavigator()
 
-const Tabs=()=>{
+type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigator">;
+
+const Tabs=({route,navigation}:TabsScreenProps)=>{
     return(
     <Tab.Navigator screenOptions={{
       tabBarActiveTintColor:'tomato',
@@ -33,7 +39,7 @@ const Tabs=()=>{
       <Tab.Screen name={'Profile'} options={{
         tabBarIcon: ({focused})=>(<Feather name='home' size={25} color={focused?'tomato':'black'}/>)
       }}>
-        {()=><ProfileScreen/>}
+        {()=><ProfileScreen navigation={navigation} route={route}/>}
       </Tab.Screen>
     </Tab.Navigator>
     )

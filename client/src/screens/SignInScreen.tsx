@@ -1,4 +1,4 @@
-import React,{ProfilerProps, useState} from 'react';
+import React,{ProfilerProps, useEffect, useState} from 'react';
 import { Text,View,StyleSheet,StatusBar,TextInput, Button, Pressable} from 'react-native';
 import { Feather} from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import axios from 'axios';
 import {BACKEND_BASE_URL} from "@env";
 import { getToken,saveToken,removeToken } from '../utils/TokenHandler';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import { getError } from '../utils/ErrorClassifier';
 
 
 type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;
@@ -16,43 +17,36 @@ type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;
 export default function SignInScreen({route,navigation}:SignInProps) {
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
+    const checkToken=async()=>{
+        let token=await getToken();
+        if(token!==null){
+            popScreen('WithinAppNavigator');
+            navigation.navigate('WithinAppNavigator')
+        }
+    }
+    useEffect(()=>{
+        checkToken()
+    })
     const popScreen=(screenName:string)=>{
         navigation.dispatch(
             StackActions.replace(screenName)
           );
     }
-    // console.log(BACKEND_BASE_URL)
-    const BACKEND_BASE_URL=`http://10.10.5.131:3000/api/v1/users`;
     const SignIn=async()=>{
-        //TODO:REMOVE IN THE END
-        removeToken()
-        let token=await getToken();
-        if(token!==null){
-            // popScreen('WithinAppNavigator');
-            // navigation.navigate('WithinAppNavigator')
-        }else{
-            console.log("HERE")
-            axios.post(`${BACKEND_BASE_URL}/login`,{email,password})
-            .then(response=>{
-                console.log(response.data);
-                saveToken(response.data.token)
-                Toast.show({type:'success',text1:'Logged In Successfully',position:'bottom'})
-                popScreen('WithinAppNavigator');
-                navigation.navigate('WithinAppNavigator')
-            }).catch((error)=>{
-                let message:string
-                let errorData=error.response.data.errors;
-                if(errorData.hasOwnProperty("email")){
-                    message=errorData.email.message
-                }else if(errorData.hasOwnProperty("password")){
-                    message=errorData.password.message
-                }else{
-                    message="UNKNOWN_ERROR"
-                }
-                Toast.show({type:'error',text1:message,position:'bottom'})
-                console.log(message)
-            })
-        }
+        console.log("HERE")
+        axios.post(`${BACKEND_BASE_URL}/login`,{email,password})
+        .then(response=>{
+            console.log(response.data);
+            saveToken(response.data.token)
+            Toast.show({type:'success',text1:'Logged In Successfully',position:'bottom'})
+            popScreen('WithinAppNavigator');
+            navigation.navigate('WithinAppNavigator')
+        }).catch((error)=>{
+            let errorData=error.response.data.errors;
+            let {name,message}=getError(errorData)
+            Toast.show({type:'error',text1:message,position:'bottom'})
+            console.log(message)
+        })
     }
     const forgotPassword=()=>{
         console.log('Forgot Password');

@@ -1,13 +1,21 @@
-import React,{useState} from 'react'
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React,{useEffect, useState} from 'react'
 import { Feather } from '@expo/vector-icons';
-import { FlatList, SafeAreaView, ScrollView,StyleSheet,Dimensions } from 'react-native';
+import { FlatList, SafeAreaView, ScrollView,StyleSheet,Dimensions, View } from 'react-native';
 import ListItem from '../components/ListItem';
 import { StatusBar } from 'react-native';
 import {  SelectList } from 'react-native-dropdown-select-list';
+import { getToken } from '../utils/TokenHandler';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../utils/AppNavigator';
+import { StackActions } from '@react-navigation/native';
+import axios from 'axios';
+import { getError } from '../utils/ErrorClassifier';
+import { ActivityIndicator, Surface } from 'react-native-paper';
+import { BACKEND_BASE_URL } from '@env';
 
 const data = [
+    {key:'Bangalore',value:'Bangalore'},
     {key:'1',value:'Jammu & Kashmir'},
     {key:'2',value:'Gujrat'},
     {key:'3',value:'Maharashtra'},
@@ -26,69 +34,66 @@ const data = [
     {key:'16',value:'H'},
   ];
 
-const data1=[{
-    userName:'xyz',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'akjd',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'avhs',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'saaq',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'saa',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'ass',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'asw',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'ase',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'asr',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'asf',
-    profilePicture:'xxx',
-    location:'thisOne'
-},{
-    userName:'asd',
-    profilePicture:'xxx',
-    location:'thisOne'
-}]
+interface UserData {
+    _id: string;
+    __v: number;
+    email: string;
+    location: string;
+    name: string;
+    phone_number: string;
+    photo: string;
+    role: string;
+    passwordResetExpires?: string;
+    passwordResetToken?: string;
+  }
 
-interface Item{
-    userName:string,
-    profilePicture:string,
-    location:string,
+type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigator">;
+
+const goToSignInPage=({route,navigation}:TabsScreenProps)=>{
+    Toast.show({type:'error',text1:"Log In again to continue"})
+    navigation.dispatch(StackActions.replace("SignIn"))
+    navigation.navigate("SignIn");
 }
 
-export default function ChooseUserScreen(){
-    const [selectedDestinationLocation,setSelectedDestinationLocation]=useState();
+export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
+    const [selectedDestinationLocation,setSelectedDestinationLocation]=useState('');
+    const [users,setUsers]=useState([]);
+    const [userData,setUserData]=useState<UserData[]>([]);
+    const [loading,setLoading]=useState(false);
+    const getUsers=async(place:string)=>{
+        let token=await getToken();
+            if(token===null){
+                goToSignInPage({route,navigation})
+            }else{
+                setLoading(true)
+                axios.get(`${BACKEND_BASE_URL}/employees/${place}`,{headers:{Authorization:`Bearer ${token}`}})
+                .then(response=>{
+                    let usersData=response.data.data.users
+                    setUserData(usersData)
+                    setLoading(false)
+                    Toast.show({type:'success',text1:'Recieved Profiles Successfully',position:'bottom'})
+                }).catch((error)=>{
+                    console.log(error.response.data)
+                    let errorData=error.response.data;
+                    let {name,message}=getError(errorData);
+                    Toast.show({type:'error',text1:message});
+                })
+            }    
+    }
     return(
         <SafeAreaView style={styles.container}>
+            {loading?<ActivityIndicator animating={loading} hidesWhenStopped={true} color={'red'} size={'large'} style={styles.loading}/>:<View/>}
             <SelectList
             setSelected={setSelectedDestinationLocation}
             data={data}
             boxStyles={styles.textInput}
             placeholder={'Destination Location*'}
-            searchPlaceholder={'Select Option*'} />
-            <FlatList data={data1} renderItem={({item})=>(<ListItem userName={item.userName} profilePicture={item.profilePicture} location={item.location} />)} keyExtractor={(item:Item)=>(item.userName)}/>
+            searchPlaceholder={'Select Option*'}
+            onSelect={()=>{
+                getUsers(selectedDestinationLocation)
+            }}/>
+            <FlatList data={userData} renderItem={({item})=>(<ListItem userName={item.name} profilePicture={item.photo} location={item.location} />)} keyExtractor={(item:UserData)=>(item.email)}/>
+            <Toast/>
         </SafeAreaView>
     )
 }
@@ -106,5 +111,15 @@ const styles=StyleSheet.create({
         height:50,
         padding:10,
         backgroundColor:'white'
-    }
+    },
+    loading: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        flex:1,
+        position: 'absolute',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }
 });

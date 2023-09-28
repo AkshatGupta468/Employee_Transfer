@@ -1,14 +1,17 @@
-import React,{useState} from 'react';
+import React,{useEffect, useState} from 'react';
 import { Text,View,StyleSheet,StatusBar,TextInput, Pressable,Dimensions, ScrollView} from 'react-native';
 import { Feather} from '@expo/vector-icons';
 import {  SelectList } from 'react-native-dropdown-select-list';
-import PhoneInput from "react-native-phone-input";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../utils/AppNavigator';
 import { getToken,saveToken,removeToken } from '../utils/TokenHandler';
 import { BACKEND_BASE_URL } from '@env';
 import axios from 'axios';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import { StackActions } from '@react-navigation/native';
+import { getError } from '../utils/ErrorClassifier';
+import PhoneInput from 'react-native-phone-input';
+import { ActivityIndicator } from 'react-native-paper';
 
 const data = [
     {key:'1',value:'Jammu & Kashmir'},
@@ -35,57 +38,70 @@ interface ProfileDataStructure{
     location:string
 }
 
-const getProfileDetails=async()=>{
-    const BACKEND_BASE_URL=`http://10.10.5.131:3000/api/v1/users`
-    let token=await getToken();
-        if(token===null){
-            //TODO navigation
-        }else{
-            axios.get(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`}})
-            .then(response=>{
-                console.log(response.data.data.user);
-                let userData=response.data.data.user
-                const profileData:ProfileDataStructure={name:userData.name,
-                phoneNumber:userData.phone_number,
-                location:userData.location}
-                Toast.show({type:'success',text1:'Recieved Profile Successfully',position:'bottom'})
-                return profileData
-            }).catch((error)=>{
-                console.log(error)
-            })
-        }    
+type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigator">;
+
+const goToSignInPage=({route,navigation}:TabsScreenProps)=>{
+    Toast.show({type:'error',text1:"Log In again to continue"})
+    navigation.dispatch(StackActions.replace("SignIn"))
+    navigation.navigate("SignIn");
 }
 
-export default function ProfileScreen(){
-
+export default function ProfileScreen({route,navigation}:TabsScreenProps){
     const [name,setName]=useState('');
     const [location,setLocation]=useState('');
     const [selectedCurrentLocation,setSelectedCurrentLocations]=useState([]);
     const [phoneNumber,setPhoneNumber]=useState('');
-    const [id,setId]=useState('');
-    const [visible, setVisible] = useState(false);
-
+    const [loading,setLoading]=useState(false);
+    useEffect(()=>{
+        getProfile()
+    },[])
+    const getProfile=async()=>{
+        const token=await getToken();
+        if(token===null){
+            console.log("HERE")
+            goToSignInPage({route,navigation})
+        }
+        try{
+            setLoading(true)
+            const response=await axios.get(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`}})
+            let userData=response.data.data.user
+            console.log("======================================================")
+            console.log(userData)
+            console.log("======================================================")
+            setName(userData.name)
+            setLocation(userData.location)
+            setPhoneNumber(userData.phone_number)
+            setLoading(false)
+            Toast.show({type:'success',text1:'Recieved Profile Successfully',position:'bottom'})
+        }catch(error){
+            Toast.show({type:'error',text1:"Couldn't retrieve profile"});
+        }
+    }
     const SaveProfile=async()=>{
-        const BACKEND_BASE_URL=`http://10.10.5.131:3000/api/v1/users`
         let token=await getToken();
         if(token===null){
-            //TODO:navigation
+            goToSignInPage({route,navigation})
         }else{
             console.log("HERE")
-            axios.patch(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`},data:{
+            setLoading(true)
+            axios.patch(`${BACKEND_BASE_URL}/profile`,{
                 name:name,
                 phone_number:phoneNumber,
                 location:location
-            }})
+            },{headers:{Authorization:`Bearer ${token}`}})
             .then(response=>{
-                console.log(response);
                 Toast.show({type:'success',text1:'Saved Profile Successfully',position:'bottom'})
+                setLoading(false)
             }).catch((error)=>{
-                console.log(error)
+                let errorData=error.response.data;
+                let {name,message}=getError(errorData);
+                Toast.show({type:'error',text1:message});
+                goToSignInPage({route,navigation})
             })
         }
     }
-    const deactivateAccount=()=>{}
+    const deactivateAccount=()=>{
+    }
     const changePassword=()=>{      
     }
     let shouldRender=true;
@@ -98,17 +114,12 @@ export default function ProfileScreen(){
             <TextInput onChangeText={setName}
              placeholder='Name*'
              autoFocus={true}
-             style={styles.textInput}/>
-             <TextInput onChangeText={setId}
-              placeholder='Empoyee Id*'
-              autoFocus={true}
-              style={styles.textInput}/>
-             <PhoneInput 
-             onChangePhoneNumber={setPhoneNumber}
-             initialCountry='in'
-             style={styles.textInput}/>
+             value={name}
+             style={styles.textInput}/>         
+             <TextInput style={styles.textInput} value={phoneNumber} onChangeText={setPhoneNumber}/>
              <SelectList
              setSelected={setSelectedCurrentLocations}
+             defaultOption={data.find(entry=>entry.key==location)}
              data={data}
              boxStyles={styles.textInput}
              placeholder={'Current Location*'}
@@ -116,7 +127,6 @@ export default function ProfileScreen(){
             <Pressable onPress={SaveProfile} style={styles.button}>
                 <Text style={styles.buttonText}>Save</Text> 
             </Pressable>
-            <Toast/>
             {shouldRender?
             <View style={{marginBottom:50}}>
                  <Text style={styles.linkText} onPress={deactivateAccount}>Deactivate Account</Text>
@@ -127,6 +137,8 @@ export default function ProfileScreen(){
                  <Text style={styles.linkText} onPress={changePassword}>Change Password</Text>
             </View>:<View>
             </View>}
+            <Toast/>
+            {loading?<ActivityIndicator animating={loading} hidesWhenStopped={true} color={'red'} size={'large'} style={styles.loading}/>:<View/>}
         </ScrollView>
     );
 }
@@ -171,5 +183,14 @@ const styles=StyleSheet.create({
     },
     linkText:{
         color:'red'
-    }
+    },loading: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        flex:1,
+        position: 'absolute',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }
 });

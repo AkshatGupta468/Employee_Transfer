@@ -53,10 +53,10 @@ const styles=StyleSheet.create({
     container:{
         flex:1,
         alignItems:'center',
-        backgroundColor:'yellow',
+        backgroundColor:'white',
     },
     roundIcon:{
-        backgroundColor:'black',
+        backgroundColor:'#25D366',
         width:80,
         height:80,
         borderRadius:40,
@@ -70,14 +70,15 @@ const styles=StyleSheet.create({
         borderRadius:10,
         width:250,
         height:50,
-        padding:10,
+        paddingHorizontal:20,
+        fontSize:16,
         backgroundColor:'white'
     },
     button:{
         width:125,
         height:40,
         marginTop:40,
-        backgroundColor:'black',
+        backgroundColor:'#25D366',
         justifyContent:'center',
         alignItems:'center',
         borderRadius:10

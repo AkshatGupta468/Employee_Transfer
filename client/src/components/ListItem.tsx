@@ -4,6 +4,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather,Entypo } from '@expo/vector-icons';
 import { FlatList, SafeAreaView, View,Text,StyleSheet } from 'react-native';
 import { StatusBar } from 'react-native';
+import { Divider } from 'react-native-paper';
+import { TouchableHighlight } from 'react-native-gesture-handler';
 
 interface Item{
     userName:string,
@@ -13,6 +15,7 @@ interface Item{
 
 export default function ListItem({userName}:Item){
     return(
+        <View>
         <View style={styles.item}>
             <View style={{flexDirection:'row',alignItems:'center'}}>
                 <View style={styles.roundIcon}>
@@ -21,8 +24,10 @@ export default function ListItem({userName}:Item){
                 <Text style={styles.itemText}>{userName}</Text>   
             </View>   
             <View>
-                <Entypo name={'chat'} size={25} color={'black'}/>    
-            </View> 
+                <Entypo name={'chat'} size={25} color={'#25D366'}/>    
+            </View>
+        </View>
+        <Divider/>
         </View>
     )
 }
@@ -31,20 +36,19 @@ const styles=StyleSheet.create({
     item:{
         flex:1,
         flexDirection:'row',
-        backgroundColor:'yellow',
+        backgroundColor:'white',
         borderRadius:10,
         margin:10,
         padding :10,
         justifyContent:'space-between',
-        alignItems:'center',
-        borderWidth:5
+        alignItems:'center'
     },
     itemText:{
         margin:2,
         fontSize:16
     },
     roundIcon:{
-        backgroundColor:'black',
+        backgroundColor:'#25D366',
         width:30,
         height:30,
         borderRadius:15,

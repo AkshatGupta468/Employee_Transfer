@@ -87,7 +87,11 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
             setSelected={setSelectedDestinationLocation}
             data={data}
             boxStyles={styles.textInput}
+            dropdownStyles={{margin:10,zIndex:1,backgroundColor:'white'}}
+            inputStyles={{fontSize:18,textAlignVertical:'center'}}
+            dropdownTextStyles={{fontSize:16}}
             placeholder={'Destination Location*'}
+            arrowicon={<Feather name={'search'} size={20}/>}
             searchPlaceholder={'Select Option*'}
             onSelect={()=>{
                 getUsers(selectedDestinationLocation)
@@ -101,16 +105,16 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
 const styles=StyleSheet.create({
     container:{
         flex:1,
-        backgroundColor:'yellow',
+        backgroundColor:'white'
     },
     textInput:{
-        marginTop:StatusBar.currentHeight||0,
         margin:10,
         borderWidth:2,
-        borderRadius:10,
+        borderRadius:25,
         height:50,
         padding:10,
-        backgroundColor:'white'
+        marginTop:(StatusBar.currentHeight||20)+20,
+        zIndex:1
     },
     loading: {
         left: 0,

@@ -19,25 +19,25 @@ type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigat
 const Tabs=({route,navigation}:TabsScreenProps)=>{
     return(
     <Tab.Navigator screenOptions={{
-      tabBarActiveTintColor:'tomato',
-      tabBarInactiveTintColor:'grey',
+      tabBarActiveTintColor:'white',
+      tabBarInactiveTintColor:'#708090',
       tabBarStyle:{
-        backgroundColor:'yellow'
+        backgroundColor:'#25D366'
       },
       headerShown:false
     }}>
       <Tab.Screen name={'About Us'}  options={{
-        tabBarIcon: ({focused})=>(<Feather name='droplet' size={25} color={focused?'tomato':'black'}/>)
+        tabBarIcon: ({focused})=>(<Feather name='droplet' size={25} color={focused?'white':'#708090'}/>)
       }}>
         {()=><AboutUsScreen/>}
       </Tab.Screen>
       <Tab.Screen name={'Choose User to transfer with'} options={{
-        tabBarIcon: ({focused})=>(<Feather name='clock' size={25} color={focused?'tomato':'black'}/>)
+        tabBarIcon: ({focused})=>(<Feather name='clock' size={25} color={focused?'white':'#708090'}/>)
       }}>
-        {()=><ChooseUserScreen />}
+        {()=><ChooseUserScreen navigation={navigation} route={route}/>}
       </Tab.Screen>
       <Tab.Screen name={'Profile'} options={{
-        tabBarIcon: ({focused})=>(<Feather name='home' size={25} color={focused?'tomato':'black'}/>)
+        tabBarIcon: ({focused})=>(<Feather name='home' size={25} color={focused?'white':'#708090'}/>)
       }}>
         {()=><ProfileScreen navigation={navigation} route={route}/>}
       </Tab.Screen>

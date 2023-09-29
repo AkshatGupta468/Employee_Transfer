@@ -9,6 +9,7 @@ import axios from 'axios';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import {  SelectList } from 'react-native-dropdown-select-list';
 import { getError } from '../utils/ErrorClassifier';
+import PasswordTextField from '../components/PasswordTextField';
 import { BACKEND_BASE_URL } from '@env';
 
 type SignUpScreenProps=NativeStackScreenProps<RootStackParamList,"SignUp">;
@@ -53,7 +54,6 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
     const [confirmPassword,setConfirmPassword]=useState('');
-    const [phoneNumber,setPhoneNumber]=useState('');
     const [name,setName]=useState('');
     const [location,setLocation]=useState('');
 
@@ -83,8 +83,7 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
             email: email,
             password: password,
             passwordConfirm:confirmPassword,
-            location: location,
-            phone_number: phoneNumber,
+            location: location
         })
         .then(response=>{
             console.log(response.data);
@@ -108,25 +107,13 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
                 placeholder='Name*'
                 autoFocus={true}
                 style={styles.textInput}/>
-             <PhoneInput 
-             onChangePhoneNumber={setPhoneNumber}
-             initialCountry='in'
-             style={styles.textInput}/>
             <TextInput onChangeText={setEmail}
              placeholder='Email Address*'
              autoFocus={true}
              autoComplete={'email'}
              style={styles.textInput}/>
-            <TextInput onChangeText={setPassword}
-             placeholder='Password*'
-             autoFocus={true}
-             secureTextEntry={true}
-             style={styles.textInput}/>
-             <TextInput onChangeText={setConfirmPassword}
-              placeholder='Confirm Password*'
-              autoFocus={true}
-              secureTextEntry={true}
-              style={styles.textInput}/>
+            <PasswordTextField setPassword={setPassword} placeHolder={'Password*'}/>
+            <PasswordTextField setPassword={setConfirmPassword} placeHolder={'Confirm Password*'}/>
              <SelectList
              setSelected={setLocation}
              data={data}
@@ -138,7 +125,7 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
                 <Text style={styles.buttonText}>Sign Up</Text>
             </Pressable>
                 <View style={{marginTop:50,flexDirection:'row',marginBottom:50}}>
-                 <Text>Already have an account? </Text>
+                 <Text style={{fontSize:16}}>Already have an account? </Text>
                  <Text onPress={SignIn} style={styles.linkText}>Sign In</Text>
                 </View>
             <Toast/>
@@ -151,10 +138,10 @@ const styles=StyleSheet.create({
     container:{
         flex:1,
         alignItems:'center',
-        backgroundColor:'yellow',
+        backgroundColor:'white',
     },
     roundIcon:{
-        backgroundColor:'black',
+        backgroundColor:'#25D366',
         width:80,
         height:80,
         borderRadius:40,
@@ -168,14 +155,15 @@ const styles=StyleSheet.create({
         borderRadius:10,
         width:250,
         height:50,
-        padding:10,
+        paddingHorizontal:20,
+        fontSize:16,
         backgroundColor:'white'
     },
     button:{
         width:125,
         height:40,
         marginTop:40,
-        backgroundColor:'black',
+        backgroundColor:'#25D366',
         justifyContent:'center',
         alignItems:'center',
         borderRadius:10
@@ -186,6 +174,7 @@ const styles=StyleSheet.create({
         fontSize:16
     },
     linkText:{
-        color:'red'
+        color:'#25D383',
+        fontSize:16
     }
 });

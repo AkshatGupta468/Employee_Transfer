@@ -19,18 +19,18 @@ export default function AboutUsScreen(){
 const styles=StyleSheet.create({
     container:{
         flex:1,
-        backgroundColor:'yellow',
+        backgroundColor:'white',
         alignItems:'center'
     },
     heading:{
         fontSize:40,
         marginTop:StatusBar.currentHeight||0,
-        color:'tomato',
+        color:'#25D366',
         fontWeight:'bold'      
     },
     body:{
         fontSize:20,
-        color:'brown',
+        color:'black',
         fontWeight:'bold',
         margin:10
     }

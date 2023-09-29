@@ -33,7 +33,6 @@ export default function SignInScreen({route,navigation}:SignInProps) {
           );
     }
     const SignIn=async()=>{
-        console.log("HERE")
         axios.post(`${BACKEND_BASE_URL}/login`,{email,password})
         .then(response=>{
             console.log(response.data);
@@ -42,10 +41,11 @@ export default function SignInScreen({route,navigation}:SignInProps) {
             popScreen('WithinAppNavigator');
             navigation.navigate('WithinAppNavigator')
         }).catch((error)=>{
-            let errorData=error.response.data.errors;
-            let {name,message}=getError(errorData)
-            Toast.show({type:'error',text1:message,position:'bottom'})
-            console.log(message)
+            console.log(error.response)
+            // let errorData=error.response.data.errors;
+            // let {name,message}=getError(errorData)
+            // Toast.show({type:'error',text1:message,position:'bottom'})
+            // console.log(message)
         })
     }
     const forgotPassword=()=>{
@@ -80,7 +80,7 @@ export default function SignInScreen({route,navigation}:SignInProps) {
             <View style={{alignItems:'center'}}>
                 <Text onPress={forgotPassword} style={[styles.linkText,{marginTop:20}]}>Forgot Password?</Text>
                 <View style={{marginTop:50,flexDirection:'row'}}>
-                 <Text>Don't Have an account? </Text>
+                 <Text style={{fontSize:16}}>Don't Have an account? </Text>
                  <Text onPress={SignUp} style={styles.linkText}>Sign Up</Text>
                 </View>
             </View>
@@ -93,10 +93,10 @@ const styles=StyleSheet.create({
     container:{
         flex:1,
         alignItems:'center',
-        backgroundColor:'yellow',
+        backgroundColor:'white',
     },
     roundIcon:{
-        backgroundColor:'black',
+        backgroundColor:'#25D366',
         width:80,
         height:80,
         borderRadius:40,
@@ -111,13 +111,14 @@ const styles=StyleSheet.create({
         width:250,
         height:50,
         padding:10,
-        backgroundColor:'white'
+        backgroundColor:'white',
+        fontSize:15
     },
     button:{
         width:125,
         height:40,
         marginTop:40,
-        backgroundColor:'black',
+        backgroundColor:'#25D366',
         justifyContent:'center',
         alignItems:'center',
         borderRadius:10
@@ -128,6 +129,7 @@ const styles=StyleSheet.create({
         fontSize:16
     },
     linkText:{
-        color:'red'
+        color:'#25D383',
+        fontSize:16
     }
 });

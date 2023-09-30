@@ -18,7 +18,7 @@ interface props{
     placeHolder:string    
 }
 export default function PasswordTextField(input:props){
-    const [secure,setSecure]=useState(false);
+    const [secure,setSecure]=useState(true);
     return(
         <View style={[{flexDirection:'row'},styles.textInput]}>
             <TextInput onChangeText={input.setPassword}

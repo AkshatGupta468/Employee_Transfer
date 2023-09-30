@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import { Text,View,StyleSheet,StatusBar,TextInput, Pressable,Dimensions, ScrollView,} from 'react-native';
+import { Text,View,StyleSheet,StatusBar,TextInput, Pressable,Dimensions, ScrollView, Alert,} from 'react-native';
 import { Feather} from '@expo/vector-icons';
 import {  SelectList } from 'react-native-dropdown-select-list';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -82,9 +82,9 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
             console.log("HERE")
             goToSignInPage({route,navigation})
         }
-        try{
-            setLoading(true)
-            const response=await axios.get(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`}})
+        setLoading(true)
+        await axios.get(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`}}).then(
+            response=>{
             let userData=response.data.data.user
             console.log("======================================================")
             console.log(userData)
@@ -95,9 +95,13 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
             setEmail(userData.email)
             setLoading(false)
             Toast.show({type:'success',text1:'Recieved Profile Successfully',position:'bottom'})
-        }catch(error){
+            }).catch(error=>{
+            if(getError(error.response.data).name==='USER_DELETED'){
+                removeToken()
+                goToSignInPage({route,navigation})
+            }
             Toast.show({type:'error',text1:"Couldn't retrieve profile"});
-        }
+        })
     }
     const [visible, setVisible] = React.useState(false);
 
@@ -110,7 +114,17 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
 
     }
     const signOut=()=>{
-
+        Alert.alert('Sign Out','Are you sure you want to Sign Out? ', [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Cancel Pressed'),
+              style: 'cancel',
+            },
+            {text: 'OK', onPress: () => {
+                removeToken();
+                goToSignInPage({route,navigation})
+            }},
+          ]);
     }
     const changePassword=()=>{   
 
@@ -126,11 +140,11 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
                         onDismiss={closeMenu}
                         contentStyle={{backgroundColor:'white'}}
                         anchor={<Feather name='menu' size={24} color={'#25D366'} onPress={openMenu}/>}>
-                        <Menu.Item leadingIcon={()=><AntDesign name="delete" size={20} color="black" />} onPress={() => {deactivateAccount}} title="Deactivate Account"/>
+                        <Menu.Item leadingIcon={()=><AntDesign name="delete" size={20} color="black" />} onPress={() => {deactivateAccount()}} title="Deactivate Account"/>
                         <Divider />
-                        <Menu.Item leadingIcon={()=><Ionicons name="exit-outline" size={24} color="black" />}  onPress={() => {signOut}} title="Sign Out" />
+                        <Menu.Item leadingIcon={()=><Ionicons name="exit-outline" size={24} color="black" />}  onPress={() => {signOut()}} title="Sign Out" />
                         <Divider />
-                        <Menu.Item leadingIcon={()=><MaterialCommunityIcons name="form-textbox-password" size={24} color="black" />}  onPress={() => {changePassword}} title="Change Password" />
+                        <Menu.Item leadingIcon={()=><MaterialCommunityIcons name="form-textbox-password" size={24} color="black" />}  onPress={() => {changePassword()}} title="Change Password" />
                     </Menu> 
                 </View>
                 <View>

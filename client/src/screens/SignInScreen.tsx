@@ -10,6 +10,10 @@ import {BACKEND_BASE_URL} from "@env";
 import { getToken,saveToken,removeToken } from '../utils/TokenHandler';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { getError } from '../utils/ErrorClassifier';
+import PasswordTextField from '../components/PasswordTextField';
+import { colors } from '../utils/colors';
+import { AppStyles, setAppTheme } from '../utils/styles';
+import { useTheme } from 'react-native-paper';
 
 
 type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;
@@ -24,9 +28,11 @@ export default function SignInScreen({route,navigation}:SignInProps) {
             navigation.navigate('WithinAppNavigator')
         }
     }
+    const currTheme=useTheme()
     useEffect(()=>{
-        checkToken()
-    })
+        setAppTheme(currTheme.dark)
+        checkToken() 
+    },[])
     const popScreen=(screenName:string)=>{
         navigation.dispatch(
             StackActions.replace(screenName)
@@ -38,14 +44,18 @@ export default function SignInScreen({route,navigation}:SignInProps) {
             console.log(response.data);
             saveToken(response.data.token)
             Toast.show({type:'success',text1:'Logged In Successfully',position:'bottom'})
-            popScreen('WithinAppNavigator');
-            navigation.navigate('WithinAppNavigator')
+            if(!response.data.user.hasOwnProperty("name")){
+                popScreen('ProfileFormScreen');
+                navigation.navigate('ProfileFormScreen')
+            }else{
+                popScreen('WithinAppNavigator');
+                navigation.navigate('WithinAppNavigator')
+            }
         }).catch((error)=>{
-            console.log(error.response)
-            // let errorData=error.response.data.errors;
-            // let {name,message}=getError(errorData)
-            // Toast.show({type:'error',text1:message,position:'bottom'})
-            // console.log(message)
+            if(getError(error.response.data.errors).name==='INVALID_EMAIL_PASSWORD'){
+                Toast.show({type:'error',text1:getError(error.response.data.errors).message,position:'bottom'})
+            }
+            //TODO When no such user is registered
         })
     }
     const forgotPassword=()=>{
@@ -57,30 +67,25 @@ export default function SignInScreen({route,navigation}:SignInProps) {
         popScreen('SignUp');
         navigation.navigate('SignUp');
     }
-    console.log("I'm in SignIn")
     return(
         <View style={styles.container}>
             <View style={styles.roundIcon}>
-                <Feather name={'lock'} size={40} color={'white'} />    
+                <Feather name={'lock'} size={40} color={'black'} />    
             </View>     
-            <Text style={{fontSize:24,marginTop:20}}>Sign In</Text>
+            <Text style={[{marginTop:20},AppStyles.heading]}>Sign In</Text>
             <TextInput onChangeText={setEmail}
              placeholder='Email Address*'
              autoFocus={true}
              autoComplete={'email'}
              style={styles.textInput}/>
-            <TextInput onChangeText={setPassword}
-            placeholder='Password*'
-            autoFocus={true}
-            secureTextEntry={true}
-            style={styles.textInput}/>
+            <PasswordTextField setPassword={setPassword} placeHolder='Password*'/>
             <Pressable onPress={SignIn} style={styles.button}>
                 <Text style={styles.buttonText}>Sign In</Text> 
             </Pressable>
             <View style={{alignItems:'center'}}>
                 <Text onPress={forgotPassword} style={[styles.linkText,{marginTop:20}]}>Forgot Password?</Text>
                 <View style={{marginTop:50,flexDirection:'row'}}>
-                 <Text style={{fontSize:16}}>Don't Have an account? </Text>
+                 <Text style={{fontSize:16,color:'white'}}>Don't Have an account? </Text>
                  <Text onPress={SignUp} style={styles.linkText}>Sign Up</Text>
                 </View>
             </View>
@@ -93,7 +98,7 @@ const styles=StyleSheet.create({
     container:{
         flex:1,
         alignItems:'center',
-        backgroundColor:'white',
+        backgroundColor:colors.dark,
     },
     roundIcon:{
         backgroundColor:'#25D366',
@@ -110,7 +115,7 @@ const styles=StyleSheet.create({
         borderRadius:10,
         width:250,
         height:50,
-        padding:10,
+        paddingHorizontal:20,
         backgroundColor:'white',
         fontSize:15
     },
@@ -124,12 +129,12 @@ const styles=StyleSheet.create({
         borderRadius:10
     },
     buttonText:{
-        color:'white',
+        color:'black',
         fontWeight:'bold',
         fontSize:16
     },
     linkText:{
-        color:'#25D383',
+        color:colors.green,
         fontSize:16
     }
 });

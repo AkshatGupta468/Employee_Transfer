@@ -30,8 +30,23 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
+exports.userInformationValidator = catchAsync(async (req, res, next) => {
+  if ((!req.user.name)  || (!req.user.location)  || (!req.user.preferredLocations)){
+    return next(
+      new AppError(400, {
+        misc: {
+          name: "Incomplete User Information",
+          message:
+            "Name, Location, Preferred LOcations are required to complete your profile and hence perform this action.",
+        },
+      })
+    );
+  }
+  next();
+});
+
 exports.getDetails = catchAsync(async (req, res) => {
-  const user = await Users.findById(req.user.id);
+  const user = await Users.findById(req.user._id);
 
   res.status(200).json({
     status: "success",
@@ -57,8 +72,9 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     req.body,
     "name",
     "location",
-    "phone_number",
-    "photo"
+    "photo",
+    "preferredLocations",
+    "deactivated"
   );
   //we can use findByIdAndUpdate as we are dealing with non sensitive data
   const updatedUser = await Users.findByIdAndUpdate(req.user.id, filteredBody, {
@@ -75,19 +91,22 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.getEmployees = catchAsync(async (req, res, next) => {
-  const users = await Users.find().where("location").in(req.params.locations);
-
-  res.status(200).json({
+  const currUser = await Users.findById(req.user._id);
+  console.log(currUser);
+  const curLocation = currUser.location;
+  const users = await Users.find().where("location").in(currUser.preferredLocations)
+  .where("preferredLocations").equals(curLocation).where("deactivated").equals(false);
+   res.status(200).json({
     status: "success",
     results: users.length,
     data: {
-      users,
+      users
     },
   });
 });
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await Users.find();
+  const users = await Users.find().where("deactivated").equals(false);
 
   res.status(200).json({
     status: "success",
@@ -97,3 +116,52 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.postImmediateProfile = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm || req.body.email) {
+    return next(
+      new AppError(400, {
+        misc: {
+          name: "WRONG ROUTE",
+          message:
+            "This route is not for password update. Please use updatePassword route",
+        },
+      })
+    );
+  }
+  //Filtering out unwanted fields that we dont want user to update
+  const filteredBody = filterObj(
+    req.body,
+    "name",
+    "location",
+    "photo",
+    "preferredLocations",
+  );
+
+  if ((!filteredBody.name) || (!filteredBody.location) || (!filteredBody.preferredLocations)){
+    return next(
+      new AppError(400, {
+        misc: {
+          name: "Required Field",
+          message:
+            "Name, Location, PreferredLocations are Required Fields.",
+        },
+      })
+    )
+  }
+  //we can use findByIdAndUpdate as we are dealing with non sensitive data
+  const updatedUser = await Users.findByIdAndUpdate(req.user._id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+  //console.log(updatedUser);
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: updatedUser,
+    },
+  });
+})
+
+
+

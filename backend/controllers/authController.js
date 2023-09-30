@@ -35,18 +35,16 @@ const createSendToken = (user, statusCode, res) => {
 
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
-    name: req.body.name,
     email: req.body.email,
-    role: req.body.role,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    location: req.body.location,
-    phone_number: req.body.phone_number,
   });
   const url = "http://www.google.com";
-  await new Email(newUser, url).sendWelcome();
+  //await new Email(newUser, url).sendWelcome();
+
   createSendToken(newUser, 201, res);
 });
+
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
@@ -89,7 +87,11 @@ exports.login = catchAsync(async (req, res, next) => {
     );
   }
   //If everythimg is OK, send the token to client
-  createSendToken(user, 200, res);
+  const updatedUser = await User.findByIdAndUpdate(user._id, {deactivated : false}, {
+    new: true,
+    runValidators: true,
+  });
+  createSendToken(updatedUser, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {

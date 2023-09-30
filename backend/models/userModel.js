@@ -6,8 +6,7 @@ const crypto = require("crypto");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Name is Required!"],
-  },
+   },
   email: {
     type: String,
     required: [true, "Email is Required!"],
@@ -44,21 +43,16 @@ const userSchema = new mongoose.Schema({
   passwordResetToken: String,
   passwordResetExpires: Date,
 
-  phone_number: {
-    type: String,
-    required: [true, "Phone Number is required"],
-    validate: [
-      (phone_number) => {
-        return validator.isMobilePhone(phone_number, "en-IN");
-      },
-      "Invalid Mobile Number",
-    ],
-  },
-
   location: {
-    type: String,
-    required: [true, "Please enter your location"],
+    type: String
   },
+  preferredLocations:{
+    type: [String]
+  },
+  deactivated:{
+    type: Boolean,
+    default: false
+  }
   /*
     image: {
       type: mongoose.Schema.Types.ObjectId,

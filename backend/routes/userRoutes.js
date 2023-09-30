@@ -9,8 +9,9 @@ userRouter.post("/signup", authController.signup);
 userRouter.post("/login", authController.login);
 userRouter.post("/forgotPassword", authController.forgotPassword);
 userRouter.patch("/resetPassword/:token", authController.resetPassword);
-
 userRouter.use(authController.protect);
+userRouter.route('/profile').post(userController.postImmediateProfile);
+userRouter.use(userController.userInformationValidator);
 
 // Protected Routes
 
@@ -20,10 +21,10 @@ userRouter
   .route("/profile")
   .get(userController.getDetails)
   .patch(userController.uploadUserPhoto, userController.updateMe);
-
+ 
 userRouter
-  .route("/employees/:locations")
-  .get(authController.protect, userController.getEmployees);
+  .route("/employees")
+  .get(userController.userInformationValidator,authController.protect, userController.getEmployees);
 
 userRouter
   .route("/allUsers")

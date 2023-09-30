@@ -1,6 +1,7 @@
 export function getError(errorData:any){
     let message='UNKNOWN ERROR!';
     let name='UNKNOWN';
+    console.log(errorData)
     if(errorData.hasOwnProperty("name")){
         message=errorData.name.message
         name=errorData.name.name

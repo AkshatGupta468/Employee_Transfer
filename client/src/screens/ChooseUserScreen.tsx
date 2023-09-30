@@ -4,7 +4,7 @@ import { FlatList, SafeAreaView, ScrollView,StyleSheet,Dimensions, View } from '
 import ListItem from '../components/ListItem';
 import { StatusBar } from 'react-native';
 import {  SelectList } from 'react-native-dropdown-select-list';
-import { getToken } from '../utils/TokenHandler';
+import { getToken, removeToken } from '../utils/TokenHandler';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../utils/AppNavigator';
@@ -74,6 +74,10 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
                     Toast.show({type:'success',text1:'Recieved Profiles Successfully',position:'bottom'})
                 }).catch((error)=>{
                     console.log(error.response.data)
+                    if(getError(error.response.data).name==='USER_DELETED'){
+                        removeToken();
+                        goToSignInPage({route,navigation})
+                    }
                     let errorData=error.response.data;
                     let {name,message}=getError(errorData);
                     Toast.show({type:'error',text1:message});

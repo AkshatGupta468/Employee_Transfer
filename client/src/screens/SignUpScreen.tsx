@@ -97,16 +97,15 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
         })
     }
     return(
-        <ScrollView>
         <View style={styles.container}>
             <View style={styles.roundIcon}>
                 <Feather name={'lock'} size={40} color={'white'} />    
             </View>     
             <Text style={{fontSize:24,marginTop:20}}>Sign Up</Text>
-            <TextInput onChangeText={setName}
+            {/* <TextInput onChangeText={setName}
                 placeholder='Name*'
                 autoFocus={true}
-                style={styles.textInput}/>
+                style={styles.textInput}/> */}
             <TextInput onChangeText={setEmail}
              placeholder='Email Address*'
              autoFocus={true}
@@ -114,12 +113,12 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
              style={styles.textInput}/>
             <PasswordTextField setPassword={setPassword} placeHolder={'Password*'}/>
             <PasswordTextField setPassword={setConfirmPassword} placeHolder={'Confirm Password*'}/>
-             <SelectList
+             {/* <SelectList
              setSelected={setLocation}
              data={data}
              boxStyles={styles.textInput}
              placeholder={'Current Location*'}
-             searchPlaceholder={'Select Option*'} />
+             searchPlaceholder={'Select Option*'} /> */}
 
             <Pressable onPress={SignUp} style={styles.button}>
                 <Text style={styles.buttonText}>Sign Up</Text>
@@ -130,7 +129,6 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
                 </View>
             <Toast/>
         </View>
-        </ScrollView>
     )
 }
 

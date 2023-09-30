@@ -102,19 +102,19 @@ async function getDDOwiseEmployeeList(ddoCode) {
   return employeeList
 }
 
-// getDDOnumberList().then((ddoNumbers) => {
-//   console.log(ddoNumbers[0])
-//   console.log(ddoNumbers[1])
-//   console.log(ddoNumbers[2])
-//   console.log(ddoNumbers[3])
-// })
-
-getDDOwiseEmployeeList("0101002").then((data) => {
-  console.log(data[0])
-  console.log(data[1])
-  console.log(data[2])
-  console.log(data[3])
+getDDOnumberList().then((ddoNumbers) => {
+  console.log(ddoNumbers[0])
+  console.log(ddoNumbers[1])
+  console.log(ddoNumbers[2])
+  console.log(ddoNumbers[3])
 })
+
+// getDDOwiseEmployeeList("0101002").then((data) => {
+//   console.log(data[0])
+//   console.log(data[1])
+//   console.log(data[2])
+//   console.log(data[3])
+// })
 // async function getAllEmployeeList() {
 //   const ddoNumbers = await getDDOnumberList()
 //   let allEmployees = []

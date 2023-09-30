@@ -1,7 +1,6 @@
 import React,{ProfilerProps, useEffect, useState} from 'react';
 import { Text,View,StyleSheet,StatusBar,TextInput, Button, Pressable} from 'react-native';
 import { Feather} from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../utils/AppNavigator';
 import { StackActions } from '@react-navigation/native';

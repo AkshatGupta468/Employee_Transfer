@@ -5,6 +5,7 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import WithinAppNavigator from './WithinAppNavigator';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import ProfileFormScreen from '../screens/ProfileFormScreen';
+import Messaging from '../screens/MessagingScreen';
 
 export type RootStackParamList={
     "SignIn":undefined;
@@ -13,6 +14,7 @@ export type RootStackParamList={
     "WithinAppNavigator":undefined;
     "ChangePassword":undefined;
     "ProfileFormScreen":undefined
+    "Messaging":undefined;
 }
 
 const {Navigator,Screen,Group}=createNativeStackNavigator<RootStackParamList>();
@@ -25,6 +27,7 @@ const AppNavigator=()=>{
                 <Screen name="SignUp" component={SignUpScreen}/>
                 <Screen name="ForgotPassword" component={ForgotPasswordScreen}/>
                 <Screen name="WithinAppNavigator" component={WithinAppNavigator}/>
+                <Screen name="Messaging" component={Messaging}/>
                 <Screen name="ChangePassword" component={ChangePasswordScreen}/>
                 <Screen name="ProfileFormScreen" component={ProfileFormScreen}/>
             </Group>

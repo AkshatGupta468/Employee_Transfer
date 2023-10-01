@@ -2,7 +2,6 @@ import React,{useEffect, useState} from 'react'
 import { Feather } from '@expo/vector-icons';
 import { FlatList, SafeAreaView, ScrollView,StyleSheet,Dimensions, View } from 'react-native';
 import ListItem from '../components/ListItem';
-import { StatusBar } from 'react-native';
 import {  MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { getToken, removeToken } from '../utils/TokenHandler';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
@@ -14,7 +13,6 @@ import { getError } from '../utils/ErrorClassifier';
 import { ActivityIndicator, Surface } from 'react-native-paper';
 import { BACKEND_BASE_URL } from '@env';
 import { AppStyles } from '../utils/AppStyles';
-import {MaterialIcons} from '@expo/vector-icons';
 
 const data = [
     {key:'Bangalore',value:'Bangalore'},

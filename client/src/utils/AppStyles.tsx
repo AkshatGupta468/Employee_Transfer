@@ -17,23 +17,25 @@ export const AppStyles=StyleSheet.create({
         justifyContent:'center',
         alignItems:'center',
         alignSelf:'center',
-        borderRadius:10
+        borderRadius:10,
     },
     buttonText:{
         color:colors.white,
         fontWeight:'bold',
-        fontSize:16
+        fontSize:16,
     },
     textInput:{
         alignSelf:'center',
         marginTop:40,
         borderWidth:2,
         borderRadius:10,
+        borderColor:colors["light-grey"],
         width:250,
         height:50,
         paddingHorizontal:20,
-        backgroundColor:colors.white,
+        backgroundColor:'#c0c0c0',
         fontSize:16,
+        elevation:15
     },
     searchBar:{
         alignSelf:'center',

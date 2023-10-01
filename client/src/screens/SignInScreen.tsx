@@ -61,6 +61,7 @@ export default function SignInScreen({route,navigation}:SignInProps) {
                 navigation.navigate('ProfileFormScreen')
             }else{
                 const myuser:User={
+                    _id:response.data.data.user._id,
                     name:response.data.data.user.name,
                     email:response.data.data.user.email,
                     location:response.data.data.user.location,

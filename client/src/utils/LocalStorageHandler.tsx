@@ -8,7 +8,8 @@ const UserParams:User={
     location:'LOCATION',
     preferredLocations:['PREFERREDLOCATIONS'],
     photo:'PHOTO',
-    email:'EMAIL'
+    email:'EMAIL',
+    _id:'ID',
 }
 
 function separateAndSaveToArray(inputString: string|null): string[] {
@@ -20,12 +21,14 @@ function separateAndSaveToArray(inputString: string|null): string[] {
 export async function getUserData(){
     console.log('Getting User...')
     try {
+        let id=await AsyncStorage.getItem(UserParams._id)
         let name=await AsyncStorage.getItem(UserParams.name);
         let email=await AsyncStorage.getItem(UserParams.email);
         let location=await AsyncStorage.getItem(UserParams.location);
         let preferredLocationsString=await AsyncStorage.getItem(UserParams.preferredLocations[0]);
         let photo=await AsyncStorage.getItem(UserParams.photo);
         let user:User={
+            _id:id===null?'':id,
             name:name===null?'':name,
             email:email===null?'':email,
             location:location===null?'':location,

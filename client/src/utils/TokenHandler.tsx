@@ -2,13 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export async function getToken(){
         console.log('Getting Token...')
-        try {
-            const value = await AsyncStorage.getItem('TOKEN')
-            return value||null;
-        } catch (error) {
-            console.log('Failed to retrieve token');
-            console.log(error);
-        }
+        const token=Promise.resolve(AsyncStorage.getItem('TOKEN'))
+        console.log(token)
+        return token;
 }
 
 export function saveToken(token:string){

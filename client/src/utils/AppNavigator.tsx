@@ -5,9 +5,12 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import WithinAppNavigator from './WithinAppNavigator';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import ProfileFormScreen from '../screens/ProfileFormScreen';
+import MessagingScreen from '../screens/MessagingScreen';
+import { Chat } from '../interfaces/app_interfaces';
 import ProfilePictureScreen from '../screens/ProfilePictureScreen';
 
 export type RootStackParamList={
+    "MessagingScreen":{chat:Chat};
     "SignIn":undefined;
     "SignUp":undefined;
     "ForgotPassword":undefined;
@@ -27,6 +30,7 @@ const AppNavigator=()=>{
                 <Screen name="SignUp" component={SignUpScreen}/>
                 <Screen name="ForgotPassword" component={ForgotPasswordScreen}/>
                 <Screen name="WithinAppNavigator" component={WithinAppNavigator}/>
+                <Screen name="MessagingScreen" component={MessagingScreen}/>
                 <Screen name="ChangePassword" component={ChangePasswordScreen}/>
                 <Screen name="ProfileFormScreen" component={ProfileFormScreen}/>
                 <Screen name="ProfilePictureScreen" component={ProfilePictureScreen}/>

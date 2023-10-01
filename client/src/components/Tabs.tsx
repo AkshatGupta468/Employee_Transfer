@@ -1,7 +1,7 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
-import AboutUsScreen from '../screens/AboutUsScreen';
+import ChatScreen from '../screens/ChatScreen';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
@@ -29,7 +29,7 @@ const Tabs=({route,navigation}:TabsScreenProps)=>{
       <Tab.Screen name={'About Us'}  options={{
         tabBarIcon: ({focused})=>(<Feather name='droplet' size={25} color={focused?'white':'#708090'}/>)
       }}>
-        {()=><AboutUsScreen/>}
+        {()=><ChatScreen/>}
       </Tab.Screen>
       <Tab.Screen name={'Choose User to transfer with'} options={{
         tabBarIcon: ({focused})=>(<Feather name='clock' size={25} color={focused?'white':'#708090'}/>)

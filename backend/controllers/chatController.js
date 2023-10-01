@@ -1,13 +1,19 @@
 const catchAsync = require("../utils/catchAsync")
 const { chatModel: Chats } = require("../models/chatModel")
 const { MessageModel: Message } = require("../models/messageModel")
+
 exports.newMessage = catchAsync(async (req, res) => {
   let chat
   if (!req.body.chatId) {
     // chat = await Chats.findOne().elemMatch("participant", (elem) => {
     //   elem.in([req.body.sentTo, req.user._id])
     // })
-
+    if (!req.body.sendTo) {
+      res.status(400).send({
+        status: "fail",
+        message: "SENDTO_ID_REQUIRED",
+      })
+    }
     chat = await Chats.findOne()
       .where("participants")
       .all([req.body.sentTo, req.user._id])
@@ -18,10 +24,12 @@ exports.newMessage = catchAsync(async (req, res) => {
         participants: [req.user._id, req.body.sentTo],
       })
     }
-  } else
+  } else {
     chat = await Chats.findById(req.body.chatId)
       .where("participants")
       .equals(req.user._id)
+  }
+
   if (!chat) {
     //send Invalid chat ID error
     return res.status(400).send({

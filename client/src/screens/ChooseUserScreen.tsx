@@ -12,6 +12,7 @@ import axios from 'axios';
 import { getError } from '../utils/ErrorClassifier';
 import { ActivityIndicator, Surface } from 'react-native-paper';
 import { BACKEND_BASE_URL } from '@env';
+import {User} from '../interfaces/app_interfaces'
 import { AppStyles } from '../utils/AppStyles';
 
 const data = [
@@ -34,18 +35,6 @@ const data = [
     {key:'16',value:'H'},
   ];
 
-interface UserData {
-    _id: string;
-    __v: number;
-    email: string;
-    location: string;
-    name: string;
-    phone_number: string;
-    photo: string;
-    role: string;
-    passwordResetExpires?: string;
-    passwordResetToken?: string;
-  }
 
 type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigator">;
 
@@ -58,8 +47,14 @@ const goToSignInPage=({route,navigation}:TabsScreenProps)=>{
 export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
     const [selectedDestinationLocation,setSelectedDestinationLocation]=useState([]);
     const [users,setUsers]=useState([]);
-    const [userData,setUserData]=useState<UserData[]>([]);
+    const [userData,setUserData]=useState<User[]>();
     const [loading,setLoading]=useState(false);
+
+    const onNewChatHandler=(user)=>{
+        navigation.navigate("Messaging",{
+            sendTo:user,
+        })
+    }
     const getUsers=async(place:string[])=>{
         let token=await getToken();
             if(token===null){
@@ -108,7 +103,7 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
                     getUsers(selectedDestinationLocation)
                 }
             }}/>
-            <FlatList data={userData} renderItem={({item})=>(<ListItem userName={item.name} profilePicture={item.photo} location={item.location} />)} keyExtractor={(item:UserData)=>(item.email)}/>
+            <FlatList data={userData} renderItem={(e)=>(<ListItem user={e.item} />)} keyExtractor={(item:User)=>(item.email)}/>
             <Toast/>
         </SafeAreaView>
     )

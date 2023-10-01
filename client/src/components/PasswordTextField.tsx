@@ -12,6 +12,7 @@ import axios from 'axios';
 import { BACKEND_BASE_URL } from '@env';
 import { getError } from '../utils/ErrorClassifier';
 import { SelectList } from 'react-native-dropdown-select-list';
+import { AppStyles } from '../utils/AppStyles';
 
 interface props{
     setPassword:React.Dispatch<React.SetStateAction<string>>
@@ -20,7 +21,7 @@ interface props{
 export default function PasswordTextField(input:props){
     const [secure,setSecure]=useState(true);
     return(
-        <View style={[{flexDirection:'row'},styles.textInput]}>
+        <View style={[{flexDirection:'row'},AppStyles.textInput]}>
             <TextInput onChangeText={input.setPassword}
              placeholder={input.placeHolder}
              autoFocus={true}
@@ -33,15 +34,3 @@ export default function PasswordTextField(input:props){
         </View>
     )
 }
-
-const styles=StyleSheet.create({
-    textInput:{
-        borderWidth:2,
-        borderRadius:10,
-        width:250,
-        height:50,
-        paddingHorizontal:20,
-        backgroundColor:'white',
-        marginTop:40
-    }
-})

@@ -3,7 +3,7 @@ import { Feather } from '@expo/vector-icons';
 import { FlatList, SafeAreaView, ScrollView,StyleSheet,Dimensions, View } from 'react-native';
 import ListItem from '../components/ListItem';
 import { StatusBar } from 'react-native';
-import {  SelectList } from 'react-native-dropdown-select-list';
+import {  MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { getToken, removeToken } from '../utils/TokenHandler';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,11 +13,13 @@ import axios from 'axios';
 import { getError } from '../utils/ErrorClassifier';
 import { ActivityIndicator, Surface } from 'react-native-paper';
 import { BACKEND_BASE_URL } from '@env';
+import { AppStyles } from '../utils/AppStyles';
+import {MaterialIcons} from '@expo/vector-icons';
 
 const data = [
     {key:'Bangalore',value:'Bangalore'},
     {key:'1',value:'Jammu & Kashmir'},
-    {key:'2',value:'Gujrat'},
+    {key:'2',value:'1'},
     {key:'3',value:'Maharashtra'},
     {key:'4',value:'Goa'},
     {key:'5',value:'X'},
@@ -56,11 +58,11 @@ const goToSignInPage=({route,navigation}:TabsScreenProps)=>{
 }
 
 export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
-    const [selectedDestinationLocation,setSelectedDestinationLocation]=useState('');
+    const [selectedDestinationLocation,setSelectedDestinationLocation]=useState([]);
     const [users,setUsers]=useState([]);
     const [userData,setUserData]=useState<UserData[]>([]);
     const [loading,setLoading]=useState(false);
-    const getUsers=async(place:string)=>{
+    const getUsers=async(place:string[])=>{
         let token=await getToken();
             if(token===null){
                 goToSignInPage({route,navigation})
@@ -73,61 +75,43 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
                     setLoading(false)
                     Toast.show({type:'success',text1:'Recieved Profiles Successfully',position:'bottom'})
                 }).catch((error)=>{
-                    console.log(error.response.data)
+                    console.log(error)
                     if(getError(error.response.data).name==='USER_DELETED'){
                         removeToken();
                         goToSignInPage({route,navigation})
                     }
                     let errorData=error.response.data;
+                    console.log(errorData)
                     let {name,message}=getError(errorData);
-                    Toast.show({type:'error',text1:message});
+                    Toast.show({type:'error',text1:message,position:'bottom'});
                 })
             }    
     }
     return(
-        <SafeAreaView style={styles.container}>
-            {loading?<ActivityIndicator animating={loading} hidesWhenStopped={true} color={'red'} size={'large'} style={styles.loading}/>:<View/>}
-            <SelectList
+        <SafeAreaView style={AppStyles.container}>
+            {loading?<ActivityIndicator animating={loading} hidesWhenStopped={true} color={'red'} size={'large'} style={AppStyles.loading}/>:<View/>}
+            <MultipleSelectList
             setSelected={setSelectedDestinationLocation}
             data={data}
-            boxStyles={styles.textInput}
-            dropdownStyles={{margin:10,zIndex:1,backgroundColor:'white'}}
+            label='Preferred Locations'
+            labelStyles={{fontSize:10}}
+            badgeStyles={AppStyles.badgeStyles}
+            boxStyles={AppStyles.searchBar}
+            dropdownStyles={{margin:10,zIndex:1,backgroundColor:'white',width:300,alignSelf:'center'}}
             inputStyles={{fontSize:18,textAlignVertical:'center'}}
             dropdownTextStyles={{fontSize:16}}
             placeholder={'Destination Location*'}
             arrowicon={<Feather name={'search'} size={20}/>}
             searchPlaceholder={'Select Option*'}
             onSelect={()=>{
-                getUsers(selectedDestinationLocation)
+                if(selectedDestinationLocation.length>5){
+                    Toast.show({type:'error',text1:'Atmost 5 places can be chosen',position:'bottom'})
+                }else{
+                    getUsers(selectedDestinationLocation)
+                }
             }}/>
             <FlatList data={userData} renderItem={({item})=>(<ListItem userName={item.name} profilePicture={item.photo} location={item.location} />)} keyExtractor={(item:UserData)=>(item.email)}/>
             <Toast/>
         </SafeAreaView>
     )
 }
-
-const styles=StyleSheet.create({
-    container:{
-        flex:1,
-        backgroundColor:'white'
-    },
-    textInput:{
-        margin:10,
-        borderWidth:2,
-        borderRadius:25,
-        height:50,
-        padding:10,
-        marginTop:(StatusBar.currentHeight||20)+20,
-        zIndex:1
-    },
-    loading: {
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        flex:1,
-        position: 'absolute',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }
-});

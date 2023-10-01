@@ -5,6 +5,7 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import WithinAppNavigator from './WithinAppNavigator';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import ProfileFormScreen from '../screens/ProfileFormScreen';
+import ProfilePictureScreen from '../screens/ProfilePictureScreen';
 
 export type RootStackParamList={
     "SignIn":undefined;
@@ -12,7 +13,8 @@ export type RootStackParamList={
     "ForgotPassword":undefined;
     "WithinAppNavigator":undefined;
     "ChangePassword":undefined;
-    "ProfileFormScreen":undefined
+    "ProfileFormScreen":undefined;
+    "ProfilePictureScreen":undefined
 }
 
 const {Navigator,Screen,Group}=createNativeStackNavigator<RootStackParamList>();
@@ -27,6 +29,7 @@ const AppNavigator=()=>{
                 <Screen name="WithinAppNavigator" component={WithinAppNavigator}/>
                 <Screen name="ChangePassword" component={ChangePasswordScreen}/>
                 <Screen name="ProfileFormScreen" component={ProfileFormScreen}/>
+                <Screen name="ProfilePictureScreen" component={ProfilePictureScreen}/>
             </Group>
         </Navigator>
     );

@@ -2,11 +2,12 @@ import React, { useLayoutEffect, useState } from "react";
 import { View, TextInput, Text, FlatList, Pressable } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import MessageComponent from "../components/MessageComponent";
 import { MessagingStyles } from "../utils/styles";
 import {Message, User,Chat} from "../interfaces/app_interfaces"
-type MessagingProps=NativeStackScreenProps<RootStackParamList,"Messaging">;
+type MessagingProps=NativeStackScreenProps<RootStackParamList,"MessagingScreen">;
 
 const MessagingScreen = ({ route, navigation }:MessagingProps) => {
     const [chatMessages, setChatMessages] = useState<Message[]>([
@@ -51,6 +52,7 @@ const MessagingScreen = ({ route, navigation }:MessagingProps) => {
 
     //👇🏻 Sets the header title to the name chatroom's name
     useLayoutEffect(() => {
+        console.log(props)
         // navigation.setOptions({ title: name });
         // getUsername()
     }, []);
@@ -63,7 +65,7 @@ const MessagingScreen = ({ route, navigation }:MessagingProps) => {
         
         setChatMessages((chatMessages)=>{
             const {chat,sendTo}=route.params;
-            
+
             const newMessage:Message={
                 id:"4",
                 content:sendText,

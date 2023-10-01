@@ -4,7 +4,8 @@ import {TextInput} from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import PhoneInput from "react-native-phone-input";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import { StackActions } from '@react-navigation/native';
 import axios from 'axios';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
@@ -75,6 +76,7 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
         console.log('Forgot Password');
         navigation.navigate("ForgotPassword");
     }
+    // @refresh reset
     const SignUp=()=>{
         console.log('Sign Up');
         axios.post(`${BACKEND_BASE_URL}/signup`,{
@@ -88,6 +90,7 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
             popScreen('ProfileFormScreen');
             navigation.navigate('ProfileFormScreen');
         }).catch((error)=>{
+            console.log(error)
             let errorData=error.response.data.errors;
             let {name,message}=getError(errorData)
             Toast.show({type:'error',text1:message,position:'bottom'})

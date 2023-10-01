@@ -2,7 +2,8 @@ import React,{ProfilerProps, useEffect, useState} from 'react';
 import { Text,View,StyleSheet,StatusBar,TextInput, Button, Pressable} from 'react-native';
 import { Feather} from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import { StackActions } from '@react-navigation/native';
 import axios from 'axios';
 import {BACKEND_BASE_URL} from "@env";
@@ -19,9 +20,11 @@ import { AppStyles } from '../utils/AppStyles';
 
 type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;
 
-export default function SignInScreen({route,navigation}:SignInProps) {
+export default function SignInScreen({navigation}:SignInProps) {
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
+    // @refresh reset
+
     const checkToken=async()=>{
         let token=await getToken()
         if(token!==null){
@@ -49,10 +52,11 @@ export default function SignInScreen({route,navigation}:SignInProps) {
             StackActions.replace(screenName)
           );
     }
+
     const SignIn=async()=>{
         axios.post(`${BACKEND_BASE_URL}/login`,{email,password})
         .then(async response=>{
-            console.log(response.data.data);
+            console.log(response.data);
             Toast.show({type:'success',text1:'Logged In Successfully',position:'bottom'})
             saveToken(response.data.token)
             if(!(response.data.data.user.hasOwnProperty("name"))||!(response.data.data.user.hasOwnProperty("location"))||!(response.data.data.user.hasOwnProperty("preferredLocations"))){
@@ -74,6 +78,9 @@ export default function SignInScreen({route,navigation}:SignInProps) {
                 navigation.navigate('WithinAppNavigator')
             }
         }).catch((error)=>{
+            console.log(error)
+            // @refresh  reset
+
             if(getError(error.response.data.errors).name==='INVALID_EMAIL_PASSWORD'){
                 Toast.show({type:'error',text1:getError(error.response.data.errors).message,position:'bottom'})
             }

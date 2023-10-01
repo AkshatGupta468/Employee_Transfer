@@ -6,7 +6,8 @@ import BottomDrawer, {BottomDrawerMethods} from 'react-native-animated-bottom-dr
 import { getToken } from '../utils/TokenHandler';
 import { RouteProp, StackActions } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import { BACKEND_BASE_URL } from '@env';

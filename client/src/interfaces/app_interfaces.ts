@@ -1,3 +1,14 @@
+export type RootStackParamList = {
+  MessagingScreen: { chat: Chat }
+  SignIn: undefined
+  SignUp: undefined
+  ForgotPassword: undefined
+  WithinAppNavigator: undefined
+  ChangePassword: undefined
+  ProfileFormScreen: undefined
+  ProfilePictureScreen: undefined
+}
+
 export interface Message {
   id: String
   content: String
@@ -20,9 +31,9 @@ export interface User {
 }
 
 export interface Chat {
-  id: String
+  id?: String
   title: String | undefined
-  messages: [Message]
+  messages?: [Message]
   participants: [User]
-  createdBy: [User]
+  createdBy: User
 }

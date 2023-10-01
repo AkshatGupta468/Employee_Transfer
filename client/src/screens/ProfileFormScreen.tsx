@@ -4,7 +4,8 @@ import {TextInput} from 'react-native-paper'
 import { Feather} from '@expo/vector-icons';
 import {  MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import { getToken,saveToken,removeToken } from '../utils/TokenHandler';
 import { BACKEND_BASE_URL } from '@env';
 import axios from 'axios';
@@ -53,9 +54,10 @@ export default function ProfileFormScreen({route,navigation}:ScreenProps){
             StackActions.replace(screenName)
           );
     }
-
+// @refresh reset
     const saveProfile=async()=>{
         let token=await getToken()
+        console.log(`Token : ${token}`)
         await axios.patch(`${BACKEND_BASE_URL}/profile`,{
             name: name,
             location: selectedCurrentLocation,

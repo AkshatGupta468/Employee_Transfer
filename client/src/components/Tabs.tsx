@@ -9,7 +9,8 @@ import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import ChooseUserScreen from '../screens/ChooseUserScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import {NativeStackScreenProps, createNativeStackNavigator} from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 
 
 const Tab=createBottomTabNavigator()

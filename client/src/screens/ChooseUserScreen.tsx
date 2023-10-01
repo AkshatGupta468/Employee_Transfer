@@ -6,7 +6,8 @@ import {  MultipleSelectList, SelectList } from 'react-native-dropdown-select-li
 import { getToken, removeToken } from '../utils/TokenHandler';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import { StackActions } from '@react-navigation/native';
 import axios from 'axios';
 import { getError } from '../utils/ErrorClassifier';
@@ -14,6 +15,7 @@ import { ActivityIndicator, Surface } from 'react-native-paper';
 import { BACKEND_BASE_URL } from '@env';
 import {User} from '../interfaces/app_interfaces'
 import { AppStyles } from '../utils/AppStyles';
+import {getUserData} from '../utils/LocalStorageHandler'
 
 const data = [
     {key:'Bangalore',value:'Bangalore'},
@@ -47,14 +49,23 @@ const goToSignInPage=({route,navigation}:TabsScreenProps)=>{
 export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
     const [selectedDestinationLocation,setSelectedDestinationLocation]=useState([]);
     const [users,setUsers]=useState([]);
-    const [userData,setUserData]=useState<User[]>();
+    const [userData,setUserData]=useState<User[]>([]);
     const [loading,setLoading]=useState(false);
 
-    const onNewChatHandler=(user)=>{
-        navigation.navigate("Messaging",{
-            sendTo:user,
-        })
+    const onNewChatHandler= async (sentTo:User)=>{
+        // const currentUser= await getUserData()
+        // if(currentUser instanceof User){
+        //     navigation.navigate("MessagingScreen",{
+        //         chat:{
+        //             createdBy:currentUser,
+        //             participants:[sentTo],
+        //             title:sentTo.name
+        //         }
+        //     })
+        // }
+        
     }
+
     const getUsers=async(place:string[])=>{
         let token=await getToken();
             if(token===null){

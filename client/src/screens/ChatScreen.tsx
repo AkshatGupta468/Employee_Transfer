@@ -28,14 +28,13 @@ const ChatScreen = () => {
                 role:"user",
                 email:"tomer@gmail.com",
             }],
-            createdBy:[{
+            createdBy:{
                     id:"1",
                     name:"Tomer",
                     location:"Banglore",
                     role:"user",
                     email:"tomer@gmail.com",
-            }
-            ],
+            },
         },
     ];
 

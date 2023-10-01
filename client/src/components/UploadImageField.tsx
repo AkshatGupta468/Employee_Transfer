@@ -9,7 +9,8 @@ import { getToken } from '../utils/TokenHandler';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { StackActions } from '@react-navigation/native';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfilePictureScreen from '../screens/ProfilePictureScreen';
 import { getUserData, saveUserPhoto } from '../utils/LocalStorageHandler';

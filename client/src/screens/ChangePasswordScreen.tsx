@@ -3,7 +3,7 @@ import { Text,View,StatusBar,TextInput, Button, Pressable} from 'react-native';
 import { Feather,Ionicons } from '@expo/vector-icons'
 import PhoneInput from "react-native-phone-input";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
 import { StackActions } from '@react-navigation/native';
 import PasswordTextField from '../components/PasswordTextField';
 import { colors } from '../utils/colors';

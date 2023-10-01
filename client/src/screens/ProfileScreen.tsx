@@ -3,7 +3,8 @@ import { Text,View,StatusBar,TextInput, Pressable,Dimensions, ScrollView, Alert,
 import { Feather} from '@expo/vector-icons';
 import {  SelectList } from 'react-native-dropdown-select-list';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import { getToken,saveToken,removeToken } from '../utils/TokenHandler';
 import { BACKEND_BASE_URL } from '@env';
 import axios from 'axios';

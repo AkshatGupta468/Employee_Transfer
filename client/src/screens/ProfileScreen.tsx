@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import { Text,View,StyleSheet,StatusBar,TextInput, Pressable,Dimensions, ScrollView, Alert,} from 'react-native';
+import { Text,View,StatusBar,TextInput, Pressable,Dimensions, ScrollView, Alert,} from 'react-native';
 import { Feather} from '@expo/vector-icons';
 import {  SelectList } from 'react-native-dropdown-select-list';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -15,6 +15,9 @@ import { ActivityIndicator, Divider, Menu,Button, PaperProvider } from 'react-na
 import EditableTextField from '../components/EditableTextField';
 import { AntDesign,Ionicons,MaterialCommunityIcons } from '@expo/vector-icons'; 
 import UploadImageField from '../components/UploadImageField';
+import ChangePasswordScreen from './ChangePasswordScreen';
+import { getUserData } from '../utils/LocalStorageHandler';
+import { AppStyles } from '../utils/AppStyles';
 
 const helpName=`This is not your username or pin.This name will be visible to other users`;
 
@@ -46,8 +49,7 @@ interface ProfileDataStructure{
 interface profileStates{
     setName:React.Dispatch<React.SetStateAction<string>>
     setLocation:React.Dispatch<React.SetStateAction<string>>
-    setSelectedCurrentLocations:React.Dispatch<React.SetStateAction<object>>
-    setPhoneNumber:React.Dispatch<React.SetStateAction<string>>
+    setPreferredLocations:React.Dispatch<React.SetStateAction<string[]>>
     setLoading:React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -62,15 +64,13 @@ const goToSignInPage=({route,navigation}:TabsScreenProps)=>{
 export default function ProfileScreen({route,navigation}:TabsScreenProps){
     const [name,setName]=useState<string>('');
     const [location,setLocation]=useState<string>('');
-    const [selectedCurrentLocation,setSelectedCurrentLocations]=useState<object>([]);
-    const [phoneNumber,setPhoneNumber]=useState<string>('');
     const [loading,setLoading]=useState<boolean>(false);
-    const [email,setEmail]=useState<string>('');
+    const [email,setEmail]=useState<string>();
+    const [preferredLocations,setPreferredLocations]=useState<string[]>([]);
     const states:profileStates={
         setName:setName,
         setLocation:setLocation,
-        setSelectedCurrentLocations:setSelectedCurrentLocations,
-        setPhoneNumber:setPhoneNumber,
+        setPreferredLocations:setPreferredLocations,
         setLoading:setLoading
     }
     useEffect(()=>{
@@ -79,27 +79,22 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
     const getProfile=async()=>{
         const token=await getToken();
         if(token===null){
-            console.log("HERE")
+            console.log("empty token")
             goToSignInPage({route,navigation})
         }
         setLoading(true)
-        await axios.get(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`}}).then(
+        await getUserData().then(
             response=>{
-            let userData=response.data.data.user
-            console.log("======================================================")
-            console.log(userData)
-            console.log("======================================================")
-            setName(userData.name)
-            setLocation(userData.location)
-            setPhoneNumber(userData.phone_number)
-            setEmail(userData.email)
-            setLoading(false)
-            Toast.show({type:'success',text1:'Recieved Profile Successfully',position:'bottom'})
-            }).catch(error=>{
-            if(getError(error.response.data).name==='USER_DELETED'){
-                removeToken()
-                goToSignInPage({route,navigation})
+            let userData=response
+            if(userData!==undefined){
+                setName(userData.name)
+                setLocation(userData.location)
+                setEmail(userData.email)
+                setPreferredLocations(userData.preferredLocations)
+                setLoading(false)
+                Toast.show({type:'success',text1:'Recieved Profile Successfully',position:'bottom'})
             }
+            }).catch(error=>{
             Toast.show({type:'error',text1:"Couldn't retrieve profile"});
         })
     }
@@ -110,10 +105,38 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
   }
 
   const closeMenu = () => setVisible(false);
-    const deactivateAccount=()=>{
+    const deactivateAccount=async ()=>{
+        closeMenu()
+        Alert.alert('Deactivate Account','Are you sure you want to deactivate your account? ', [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Cancel Pressed'),
+              style: 'cancel',
+            },
+            {text: 'OK', onPress: async () => {
+            const token=await getToken();
+            if(token===null){
+                console.log("empty token")
+                goToSignInPage({route,navigation})
+            }
+            await axios.patch(`${BACKEND_BASE_URL}/profile`,{deactivated:true},{headers:{Authorization:`Bearer ${token}`}}).
+            then(response=>{
+                console.log(response.data)
+                removeToken();
+                goToSignInPage({route,navigation})
+            }).catch(error=>{
+            if(getError(error.response.data).name==='USER_DELETED'){
+                removeToken()
+                goToSignInPage({route,navigation})
+            }
+            Toast.show({type:'error',text1:"Couldn't retrieve profile"});
+        })
 
+    }},
+    ]);
     }
     const signOut=()=>{
+        closeMenu()
         Alert.alert('Sign Out','Are you sure you want to Sign Out? ', [
             {
               text: 'Cancel',
@@ -126,13 +149,14 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
             }},
           ]);
     }
-    const changePassword=()=>{   
-
+    const changePassword=()=>{
+        closeMenu()
+        navigation.navigate("ChangePassword");        
     }
     return(
-        <View style={styles.container}>
+        <View style={AppStyles.container}>
             <PaperProvider>
-            <View style={{flexDirection:'row-reverse',marginTop:(StatusBar.currentHeight||20)+40,justifyContent:'center'}}>
+            <View style={[AppStyles.topMostItem,{flexDirection:'row-reverse',justifyContent:'center'}]}>
                 <View style={{position:'absolute',left:0,marginHorizontal:20}}>
                     <Menu
                         anchorPosition='top'
@@ -156,14 +180,14 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
             </View>
              <EditableTextField icon='user' 
              fieldName='Name' 
-             fieldValue={name} 
+             fieldValue={name}  
+             fieldObj={[]}
              iconSize={20} 
              help={helpName} 
              editable={true} 
              setName={setName} 
-             setLocation={setLocation} 
-             setPhoneNumber={setPhoneNumber} 
-             setSelectedCurrentLocations={setSelectedCurrentLocations}
+             setLocation={setLocation}
+             setPreferredLocations={setPreferredLocations}
              setLoading={setLoading}
              route={route}
              navigation={navigation}></EditableTextField>
@@ -172,87 +196,53 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
 
              <EditableTextField icon='map-pin' 
              fieldName='Location' 
-             fieldValue={location} 
+             fieldValue={location}  
+             fieldObj={[]}
              iconSize={20} 
              help={``}
              editable={true} 
              setName={setName} 
-             setLocation={setLocation} 
-             setPhoneNumber={setPhoneNumber} 
-             setSelectedCurrentLocations={setSelectedCurrentLocations}
+             setLocation={setLocation}
+             setPreferredLocations={setPreferredLocations}
              setLoading={setLoading}
              route={route}
              navigation={navigation}></EditableTextField>
 
              <Divider/>
 
-            <EditableTextField icon='mail' 
-             fieldName='Email' 
-             fieldValue={email} 
+            <EditableTextField icon='search-location' 
+             fieldName='Preferred Locations' 
+             fieldValue={''}
+             fieldObj={preferredLocations} 
              iconSize={20} 
-             help={`This is the registered email id`}
-             editable={false} 
+             help={''} 
+             editable={true} 
              setName={setName} 
-             setLocation={setLocation} 
-             setPhoneNumber={setPhoneNumber} 
-             setSelectedCurrentLocations={setSelectedCurrentLocations}
+             setLocation={setLocation}
+             setPreferredLocations={setPreferredLocations}
              setLoading={setLoading}
              route={route}
              navigation={navigation}></EditableTextField>
             <Toast/>
-            {loading?<ActivityIndicator animating={loading} hidesWhenStopped={true} color={'#25D366'} size={'large'} style={styles.loading}/>:<View/>}
+            {loading?<ActivityIndicator animating={loading} hidesWhenStopped={true} color={'#25D366'} size={'large'} style={AppStyles.loading}/>:<View/>}
+             
+             <Divider/>
+
+            <EditableTextField icon='mail' 
+             fieldName='Email' 
+             fieldValue={email} 
+             fieldObj={[]}
+             iconSize={20} 
+             help={`This is the registered email id`}
+             editable={false} 
+             setName={setName} 
+             setLocation={setLocation}
+             setPreferredLocations={setPreferredLocations}
+             setLoading={setLoading}
+             route={route}
+             navigation={navigation}></EditableTextField>
+             
              </PaperProvider>
         </View>
     );
 }
-
-const styles=StyleSheet.create({
-    container:{
-        backgroundColor:'white',
-        flex:1
-    },
-    roundIcon:{
-        backgroundColor:'#25D366',
-        marginVertical:10,
-        width:160,
-        height:160,
-        borderRadius:80,
-        alignItems:'center',
-        justifyContent:'center',
-        alignSelf:'center'
-    },
-    textInput:{
-        marginTop:30,
-        borderWidth:2,
-        borderRadius:10,
-        width:250,
-        height:50,
-        padding:10,
-        backgroundColor:'white'
-    },
-    button:{
-        width:125,
-        height:40,
-        marginTop:40,
-        marginBottom:20,
-        backgroundColor:'black',
-        justifyContent:'center',
-        alignItems:'center',
-        borderRadius:10
-    },
-    buttonText:{
-        color:'white',
-        fontWeight:'bold',
-        fontSize:16
-    },
-    loading: {
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        flex:1,
-        position: 'absolute',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }
-});

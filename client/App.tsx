@@ -12,12 +12,14 @@ import { Button, Divider, Drawer, Menu, PaperProvider } from 'react-native-paper
 import EditableTextField from './src/components/EditableTextField';
 import { Feather} from '@expo/vector-icons';
 import UploadImageField from './src/components/UploadImageField';
+import ProfileFormScreen from './src/screens/ProfileFormScreen';
+import ListItem from './src/components/ListItem';
+import ProfilePictureScreen from './src/screens/ProfilePictureScreen';
 // import 'react-native-gesture-handler';
 
 export default function App() {
   console.log("App load...");
   const [visible, setVisible] = React.useState(false);
-
   const openMenu = () => {
     console.log("clicked")
     setVisible(true);

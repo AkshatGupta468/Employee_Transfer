@@ -1,6 +1,6 @@
 import React,{useEffect, useState,useRef} from 'react';
 import { Text,View,StyleSheet,StatusBar,TextInput, Pressable,Dimensions, ScrollView, Touchable, TouchableHighlight, Button} from 'react-native';
-import { Feather} from '@expo/vector-icons';
+import { Feather,FontAwesome5} from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import BottomDrawer, {BottomDrawerMethods} from 'react-native-animated-bottom-drawer';
 import { getToken } from '../utils/TokenHandler';
@@ -11,19 +11,22 @@ import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import { BACKEND_BASE_URL } from '@env';
 import { getError } from '../utils/ErrorClassifier';
-import { SelectList } from 'react-native-dropdown-select-list';
+import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
+import { colors } from '../utils/colors';
+import { saveUserLocation, saveUserName, saveUserPreferredLocations } from '../utils/LocalStorageHandler';
+import { AppStyles } from '../utils/AppStyles';
 
 interface EditableTextFieldParams{
     icon:string,
     fieldName?:string,
     fieldValue?:string,
+    fieldObj:string[],
     iconSize?:number,
     help:string,
     editable:boolean,
     setName:React.Dispatch<React.SetStateAction<string>>,
     setLocation:React.Dispatch<React.SetStateAction<string>>,
-    setSelectedCurrentLocations:React.Dispatch<React.SetStateAction<object>>,
-    setPhoneNumber:React.Dispatch<React.SetStateAction<string>>,
+    setPreferredLocations:React.Dispatch<React.SetStateAction<string[]>>,
     setLoading:React.Dispatch<React.SetStateAction<boolean>>,
     route:RouteProp<RootStackParamList, "WithinAppNavigator">,
     navigation:NativeStackNavigationProp<RootStackParamList, "WithinAppNavigator", undefined>
@@ -61,12 +64,10 @@ export default function EditableTextField(input:EditableTextFieldParams){
     const navigation=input.navigation
     const [clicked,setClicked]=useState(false);
     const [newValue,setValue]=useState('');
+    const [newValueObj,setValueObj]=useState<string[]>([]);
     const bottomDrawerRef = useRef<BottomDrawerMethods>(null);
-    useEffect(()=>{
-        
-    },[input.fieldValue])
     const openDrawer=()=>{
-        if(input.fieldName==='Location')
+        if(input.fieldName==='Location'||input.fieldName==='Preferred Locations')
             bottomDrawerRef.current?.open()
         else
             bottomDrawerRef.current?.open(150)      
@@ -81,24 +82,26 @@ export default function EditableTextField(input:EditableTextFieldParams){
             var patchData
             if(input.fieldName==='Name'){
                 patchData={name:newValue};
-            }else if(input.fieldName==='Phone Number'){
-                patchData={phone_number:newValue};
+                console.log("NAME")
             }else if(input.fieldName==='Location'){
                 patchData={location:newValue};
             }else{
-                patchData={};
+                patchData={preferredLocations:newValueObj};
             }
             bottomDrawerRef.current?.close()
-            console.log(patchData)
             axios.patch(`${BACKEND_BASE_URL}/profile`,patchData,{headers:{Authorization:`Bearer ${token}`}})
-            .then(response=>{
+            .then(async response=>{
                 console.log(response.data)
                 if(input.fieldName==='Name'){
                     input.setName(newValue)
-                }else if(input.fieldName==='Phone Number'){
-                    input.setPhoneNumber(newValue)
+                    await saveUserName(newValue)
                 }else if(input.fieldName==='Location'){
                     input.setLocation(newValue)
+                    await saveUserLocation(newValue)
+                }else if(input.fieldName==='Preferred Locations'){
+                    input.setPreferredLocations(newValueObj)
+                    await saveUserPreferredLocations(newValueObj)
+                    setValueObj([])
                 }
                 Toast.show({type:'success',text1:'Saved Profile Successfully',position:'bottom'})
                 input.setLoading(false)
@@ -120,14 +123,17 @@ export default function EditableTextField(input:EditableTextFieldParams){
                 <Feather name={'mail'} size={input.iconSize} color={'#6B6764'}/>:
                 input.icon==='user'?
                 <Feather name={'user'} size={input.iconSize} color={'#6B6764'}/>:
-                input.icon==='phone'?
-                <Feather name={'phone'} size={input.iconSize} color={'#6B6764'}/>:
+                input.icon==='search-location'?
+                <FontAwesome5 name={'search-location'} size={input.iconSize} color={'#6B6764'}/>:
                 <View></View>
             }
             </View>
             <View>
                 <Text style={styles.helperText}>{input.fieldName}</Text>
-                <Text style={styles.inputText}>{input.fieldValue}</Text>
+                {input.fieldName!=='Preferred Locations'?
+                    <Text style={styles.inputText}>{input.fieldValue}</Text>:
+                    <Text style={styles.inputText}>{input.fieldObj.join(',')}</Text>
+                }
                 <Text style={styles.helperText}>{input.help}</Text>
             </View>
             {   input.editable?
@@ -145,8 +151,20 @@ export default function EditableTextField(input:EditableTextFieldParams){
                         data={data}
                         placeholder={'Current Location*'}
                         searchPlaceholder={'Select Option*'} />:
-                        <TextInput onChangeText={setValue} defaultValue={input.fieldValue}></TextInput>
+                        input.fieldName==='Preferred Locations'?
+                        <MultipleSelectList
+                        boxStyles={{marginVertical:20}}
+                        dropdownStyles={{maxHeight:200}}
+                        inputStyles={{color:colors['dark'],fontSize:16}}
+                        labelStyles={{fontSize:0}}
+                        badgeStyles={AppStyles.badgeStyles}
+                        setSelected={setValueObj}
+                        data={data}
+                        placeholder={'Preferred Location(s)*'}
+                        searchPlaceholder={'Select Option*'}/>
+                        :<TextInput onChangeText={setValue} defaultValue={input.fieldValue}></TextInput>
                     }
+
                     <View style={{flexDirection:'row-reverse'}}>
                     <TouchableHighlight activeOpacity={1} style={styles.textButton} underlayColor={'#6B6764'} onPress={async()=>{await SaveProfile()}}>
                         <Text style={styles.text}>Save</Text>

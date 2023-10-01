@@ -1,5 +1,6 @@
 import React,{useState} from 'react';
-import { Text,View,StyleSheet,StatusBar,TextInput, Button, Pressable,ScrollView} from 'react-native';
+import { Text,View,StatusBar, Button, Pressable,ScrollView} from 'react-native';
+import {TextInput} from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import PhoneInput from "react-native-phone-input";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -11,6 +12,8 @@ import {  SelectList } from 'react-native-dropdown-select-list';
 import { getError } from '../utils/ErrorClassifier';
 import PasswordTextField from '../components/PasswordTextField';
 import { BACKEND_BASE_URL } from '@env';
+import { saveToken } from '../utils/TokenHandler';
+import { AppStyles } from '../utils/AppStyles';
 
 type SignUpScreenProps=NativeStackScreenProps<RootStackParamList,"SignUp">;
 
@@ -56,10 +59,6 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
     const [confirmPassword,setConfirmPassword]=useState('');
     const [name,setName]=useState('');
     const [location,setLocation]=useState('');
-
-    
-    // console.log("I'm in SignUp")
-    // console.log(navigation)
     
     const popScreen=(screenName:string)=>{
         navigation.dispatch(
@@ -79,16 +78,15 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
     const SignUp=()=>{
         console.log('Sign Up');
         axios.post(`${BACKEND_BASE_URL}/signup`,{
-            name: name,
             email: email,
             password: password,
-            passwordConfirm:confirmPassword,
-            location: location
+            passwordConfirm:confirmPassword
         })
         .then(response=>{
             console.log(response.data);
-            popScreen('WithinAppNavigator');
-            navigation.navigate('WithinAppNavigator');
+            saveToken(response.data.token)
+            popScreen('ProfileFormScreen');
+            navigation.navigate('ProfileFormScreen');
         }).catch((error)=>{
             let errorData=error.response.data.errors;
             let {name,message}=getError(errorData)
@@ -97,82 +95,26 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
         })
     }
     return(
-        <View style={styles.container}>
-            <View style={styles.roundIcon}>
+        <View style={AppStyles.container}>
+            <View style={[AppStyles.topMostItem,AppStyles.roundIcon]}>
                 <Feather name={'lock'} size={40} color={'white'} />    
             </View>     
-            <Text style={{fontSize:24,marginTop:20}}>Sign Up</Text>
-            {/* <TextInput onChangeText={setName}
-                placeholder='Name*'
-                autoFocus={true}
-                style={styles.textInput}/> */}
+            <Text style={[{marginTop:20},AppStyles.heading]}>Sign Up</Text>
             <TextInput onChangeText={setEmail}
              placeholder='Email Address*'
              autoFocus={true}
              autoComplete={'email'}
-             style={styles.textInput}/>
+             style={AppStyles.textInput}/>
             <PasswordTextField setPassword={setPassword} placeHolder={'Password*'}/>
             <PasswordTextField setPassword={setConfirmPassword} placeHolder={'Confirm Password*'}/>
-             {/* <SelectList
-             setSelected={setLocation}
-             data={data}
-             boxStyles={styles.textInput}
-             placeholder={'Current Location*'}
-             searchPlaceholder={'Select Option*'} /> */}
-
-            <Pressable onPress={SignUp} style={styles.button}>
-                <Text style={styles.buttonText}>Sign Up</Text>
+            <Pressable onPress={SignUp} style={AppStyles.button}>
+                <Text style={AppStyles.buttonText}>Sign Up</Text>
             </Pressable>
-                <View style={{marginTop:50,flexDirection:'row',marginBottom:50}}>
-                 <Text style={{fontSize:16}}>Already have an account? </Text>
-                 <Text onPress={SignIn} style={styles.linkText}>Sign In</Text>
+                <View style={{flexDirection:'row',marginTop:50,alignSelf:'center'}}>
+                 <Text style={AppStyles.infoText}>Already have an account? </Text>
+                 <Text onPress={SignIn} style={AppStyles.linkText}>Sign In</Text>
                 </View>
             <Toast/>
         </View>
     )
 }
-
-const styles=StyleSheet.create({
-    container:{
-        flex:1,
-        alignItems:'center',
-        backgroundColor:'white',
-    },
-    roundIcon:{
-        backgroundColor:'#25D366',
-        width:80,
-        height:80,
-        borderRadius:40,
-        alignItems:'center',
-        justifyContent:'center',
-        marginTop:100
-    },
-    textInput:{
-        marginTop:40,
-        borderWidth:2,
-        borderRadius:10,
-        width:250,
-        height:50,
-        paddingHorizontal:20,
-        fontSize:16,
-        backgroundColor:'white'
-    },
-    button:{
-        width:125,
-        height:40,
-        marginTop:40,
-        backgroundColor:'#25D366',
-        justifyContent:'center',
-        alignItems:'center',
-        borderRadius:10
-    },
-    buttonText:{
-        color:'white',
-        fontWeight:'bold',
-        fontSize:16
-    },
-    linkText:{
-        color:'#25D383',
-        fontSize:16
-    }
-});

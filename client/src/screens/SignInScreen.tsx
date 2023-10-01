@@ -11,8 +11,10 @@ import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { getError } from '../utils/ErrorClassifier';
 import PasswordTextField from '../components/PasswordTextField';
 import { colors } from '../utils/colors';
-import { AppStyles, setAppTheme } from '../utils/styles';
 import { useTheme } from 'react-native-paper';
+import User from '../utils/Datatypes';
+import { saveUserData } from '../utils/LocalStorageHandler';
+import { AppStyles } from '../utils/AppStyles';
 
 
 type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;
@@ -21,15 +23,24 @@ export default function SignInScreen({route,navigation}:SignInProps) {
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
     const checkToken=async()=>{
-        let token=await getToken();
+        let token=await getToken()
         if(token!==null){
-            popScreen('WithinAppNavigator');
-            navigation.navigate('WithinAppNavigator')
+            await axios.get(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`}})
+            .then(response=>{
+                if(!response.data.data.user.hasOwnProperty("name")||!response.data.data.user.hasOwnProperty("location")||!response.data.data.user.hasOwnProperty("preferredLocations")){
+                    popScreen('ProfileFormScreen');
+                    navigation.navigate('ProfileFormScreen')
+                }else{
+                    popScreen('WithinAppNavigator');
+                    navigation.navigate('WithinAppNavigator')
+                }                 
+            }).catch(error=>{
+                console.log(error.response.data)
+                Toast.show({type:'error',text1:error})                                
+            })
         }
     }
-    const currTheme=useTheme()
     useEffect(()=>{
-        setAppTheme(currTheme.dark)
         checkToken() 
     },[])
     
@@ -40,14 +51,24 @@ export default function SignInScreen({route,navigation}:SignInProps) {
     }
     const SignIn=async()=>{
         axios.post(`${BACKEND_BASE_URL}/login`,{email,password})
-        .then(response=>{
-            console.log(response.data);
-            saveToken(response.data.token)
+        .then(async response=>{
+            console.log(response.data.data);
             Toast.show({type:'success',text1:'Logged In Successfully',position:'bottom'})
-            if(!response.data.user.hasOwnProperty("name")){
+            saveToken(response.data.token)
+            if(!(response.data.data.user.hasOwnProperty("name"))||!(response.data.data.user.hasOwnProperty("location"))||!(response.data.data.user.hasOwnProperty("preferredLocations"))){
+                console.log("GO to profile form screen")
                 popScreen('ProfileFormScreen');
                 navigation.navigate('ProfileFormScreen')
             }else{
+                const myuser:User={
+                    name:response.data.data.user.name,
+                    email:response.data.data.user.email,
+                    location:response.data.data.user.location,
+                    preferredLocations:response.data.data.user.preferredLocations,
+                    photo:response.data.data.user.hasOwnProperty("photo")?response.data.data.user.photo:''
+                }
+                await saveUserData(myuser)
+                console.log("go within app")
                 popScreen('WithinAppNavigator');
                 navigation.navigate('WithinAppNavigator')
             }
@@ -68,73 +89,28 @@ export default function SignInScreen({route,navigation}:SignInProps) {
         navigation.navigate('SignUp');
     }
     return(
-        <View style={styles.container}>
-            <View style={styles.roundIcon}>
-                <Feather name={'lock'} size={40} color={'black'} />    
+        <View style={AppStyles.container}>
+            <View style={[AppStyles.topMostItem,AppStyles.roundIcon]}>
+                <Feather name={'lock'} size={40} color={colors.white} />    
             </View>     
             <Text style={[{marginTop:20},AppStyles.heading]}>Sign In</Text>
             <TextInput onChangeText={setEmail}
              placeholder='Email Address*'
              autoFocus={true}
              autoComplete={'email'}
-             style={styles.textInput}/>
+             style={AppStyles.textInput}/>
             <PasswordTextField setPassword={setPassword} placeHolder='Password*'/>
-            <Pressable onPress={SignIn} style={styles.button}>
-                <Text style={styles.buttonText}>Sign In</Text> 
+            <Pressable onPress={SignIn} style={AppStyles.button}>
+                <Text style={AppStyles.buttonText}>Sign In</Text> 
             </Pressable>
             <View style={{alignItems:'center'}}>
-                <Text onPress={forgotPassword} style={[styles.linkText,{marginTop:20}]}>Forgot Password?</Text>
+                <Text onPress={forgotPassword} style={[AppStyles.linkText,{marginTop:20}]}>Forgot Password?</Text>
                 <View style={{marginTop:50,flexDirection:'row'}}>
-                 <Text style={{fontSize:16,color:'white'}}>Don't Have an account? </Text>
-                 <Text onPress={SignUp} style={styles.linkText}>Sign Up</Text>
+                 <Text style={AppStyles.infoText}>Don't Have an account? </Text>
+                 <Text onPress={SignUp} style={AppStyles.linkText}>Sign Up</Text>
                 </View>
             </View>
             <Toast/>
         </View>
     )
 }
-
-const styles=StyleSheet.create({
-    container:{
-        flex:1,
-        alignItems:'center',
-        backgroundColor:colors.dark,
-    },
-    roundIcon:{
-        backgroundColor:'#25D366',
-        width:80,
-        height:80,
-        borderRadius:40,
-        alignItems:'center',
-        justifyContent:'center',
-        marginTop:100
-    },
-    textInput:{
-        marginTop:40,
-        borderWidth:2,
-        borderRadius:10,
-        width:250,
-        height:50,
-        paddingHorizontal:20,
-        backgroundColor:'white',
-        fontSize:15
-    },
-    button:{
-        width:125,
-        height:40,
-        marginTop:40,
-        backgroundColor:'#25D366',
-        justifyContent:'center',
-        alignItems:'center',
-        borderRadius:10
-    },
-    buttonText:{
-        color:'black',
-        fontWeight:'bold',
-        fontSize:16
-    },
-    linkText:{
-        color:colors.green,
-        fontSize:16
-    }
-});

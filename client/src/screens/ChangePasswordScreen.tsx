@@ -1,10 +1,18 @@
 import React,{useState} from 'react';
-import { Text,View,StyleSheet,StatusBar,TextInput, Button, Pressable} from 'react-native';
-import { Feather } from '@expo/vector-icons'
+import { Text,View,StatusBar,TextInput, Button, Pressable} from 'react-native';
+import { Feather,Ionicons } from '@expo/vector-icons'
 import PhoneInput from "react-native-phone-input";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../utils/AppNavigator';
 import { StackActions } from '@react-navigation/native';
+import PasswordTextField from '../components/PasswordTextField';
+import { colors } from '../utils/colors';
+import { getToken } from '../utils/TokenHandler';
+import axios from 'axios';
+import { BACKEND_BASE_URL } from '@env';
+import Toast from 'react-native-toast-message';
+import { getError } from '../utils/ErrorClassifier';
+import { AppStyles } from '../utils/AppStyles';
 
 type ChangePasswordScreenProps=NativeStackScreenProps<RootStackParamList,"ChangePassword">;
 
@@ -21,77 +29,34 @@ export default function ChangePasswordScreen({route,navigation}:ChangePasswordSc
             StackActions.replace(screenName)
           );
     }
-    const Change=()=>{
+    const Change=async()=>{
         console.log('Change');
-        navigation.pop(1);
+        let token=await getToken();
+        axios.patch(`${BACKEND_BASE_URL}/updatePassword`,{
+            
+        },{headers:{Authorization:`Bearer ${token}`}})
+            .then(response=>{
+                console.log(response.data)
+                Toast.show({type:'success',text1:'Password Changed Successfully',position:'bottom'})
+            }).catch((error)=>{
+                let errorData=error.response.data;
+                let {name,message}=getError(errorData);
+                Toast.show({type:'error',text1:message});
+            })
     }
     return(
-        <View style={styles.container}>
-            <View style={styles.roundIcon}>
+        <View style={AppStyles.container}>
+            <Ionicons name="arrow-back-outline" size={30} color={colors['dark']} style={[{position:'absolute',left:0,paddingHorizontal:10},AppStyles.topMostItem]} onPress={()=>navigation.goBack()}/>
+            <View style={[AppStyles.roundIcon,AppStyles.topMostItem]}>
                 <Feather name={'lock'} size={40} color={'white'} />    
             </View>     
-            <Text style={{fontSize:24,marginTop:20}}>Change Password</Text>
-            <TextInput onChangeText={setOldPassword}
-             placeholder='Current Password*'
-             autoFocus={true}
-             secureTextEntry={true}
-             style={styles.textInput}/>
-            <TextInput onChangeText={setNewPassword}
-            placeholder='New Password*'
-            autoFocus={true}
-            secureTextEntry={true}
-            style={styles.textInput}/>
-            <TextInput onChangeText={setConfirmationPassword}
-            placeholder='Confirm New Password*'
-            autoFocus={true}
-            secureTextEntry={true}
-            style={styles.textInput}/>
-            <Pressable onPress={Change} style={styles.button}>
-                <Text style={styles.buttonText}>Change</Text>
+            <Text style={[AppStyles.heading,{marginTop:20}]}>Change Password</Text>
+            <PasswordTextField placeHolder='Current Password*' setPassword={setOldPassword}/>
+            <PasswordTextField placeHolder='New Password*' setPassword={setNewPassword}/>
+            <PasswordTextField placeHolder='Confirm New Password*' setPassword={setConfirmationPassword}/>
+            <Pressable onPress={Change} style={AppStyles.button}>
+                <Text style={AppStyles.buttonText}>Change</Text>
             </Pressable>
         </View>
     )
 }
-
-const styles=StyleSheet.create({
-    container:{
-        flex:1,
-        alignItems:'center',
-        backgroundColor:'yellow',
-    },
-    roundIcon:{
-        backgroundColor:'black',
-        width:80,
-        height:80,
-        borderRadius:40,
-        alignItems:'center',
-        justifyContent:'center',
-        marginTop:100
-    },
-    textInput:{
-        marginTop:40,
-        borderWidth:2,
-        borderRadius:10,
-        width:250,
-        height:50,
-        padding:10,
-        backgroundColor:'white'
-    },
-    button:{
-        width:125,
-        height:40,
-        marginTop:40,
-        backgroundColor:'black',
-        justifyContent:'center',
-        alignItems:'center',
-        borderRadius:10
-    },
-    buttonText:{
-        color:'white',
-        fontWeight:'bold',
-        fontSize:16
-    },
-    linkText:{
-        color:'red'
-    }
-});

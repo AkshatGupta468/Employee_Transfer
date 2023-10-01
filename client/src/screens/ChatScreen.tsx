@@ -5,46 +5,36 @@ import { StyleSheet } from "react-native";
 
 import ChatComponent from "../components/ChatComponent";
 import Modal from "./Modal";
-
-import axios from "axios";
-const Chat = () => {
+import { Chat } from "../interfaces/app_interfaces";
+const ChatScreen = () => {
     const [visible, setVisible] = useState(false);
     //👇🏻 Dummy list of rooms
-    const rooms = [
+    const rooms:[Chat] = [
         {
             id: "1",
-            name: "Novu Hangouts",
+            title:'ad',
             messages: [
                 {
-                    id: "1a",
-                    text: "Hello guys, welcome!",
-                    time: "07:50",
-                    user: "Tomer",
-                },
-                {
-                    id: "1b",
-                    text: "Hi Tomer, thank you! 😇",
-                    time: "08:50",
-                    user: "David",
-                },
-            ],
-        },
-        {
-            id: "2",
-            name: "Hacksquad Team 1",
-            messages: [
-                {
-                    id: "2a",
-                    text: "Guys, who's awake? 🙏🏽",
-                    time: "12:50",
-                    user: "Team Leader",
-                },
-                {
-                    id: "2b",
-                    text: "What's up? 🧑🏻‍💻",
-                    time: "03:50",
-                    user: "Victoria",
-                },
+                    id: "2",
+                    content: "Hi Tomer, thank you! 😇",
+                    timestamp: "08:50",
+                    sender: "David",
+                    chatId:"asdf",
+                }],
+            participants:[{
+                id:"1",
+                name:"Tomer",
+                location:"Banglore",
+                role:"user",
+                email:"tomer@gmail.com",
+            }],
+            createdBy:[{
+                    id:"1",
+                    name:"Tomer",
+                    location:"Banglore",
+                    role:"user",
+                    email:"tomer@gmail.com",
+            }
             ],
         },
     ];
@@ -54,8 +44,6 @@ const Chat = () => {
             <View style={styles.chattopContainer}>
                 <View style={styles.chatheader}>
                     <Text style={styles.chatheading}> Chats</Text>
-
-            {/* 👇🏻 Logs "ButtonPressed" to the console when the icon is clicked */}
                     <Pressable onPress={() => console.log("Button Pressed!")}>
                         <Feather name='edit' size={24} color='green' />
                     </Pressable>
@@ -66,8 +54,7 @@ const Chat = () => {
                 {rooms.length > 0 ? (
                     <FlatList
                         data={rooms}
-                        renderItem={({ item }) => <ChatComponent item={item} />}
-                        keyExtractor={(item) => item.id}
+                        renderItem={(e) => <ChatComponent chat={e.item} />}
                     />
                 ) : (
                     <View style={styles.chatemptyContainer}>
@@ -81,7 +68,7 @@ const Chat = () => {
     );
 };
 
-export default Chat;
+export default ChatScreen;
 
 
 
@@ -114,7 +101,6 @@ const styles = StyleSheet.create({
         padding: 12,
         marginVertical: 10,
         width: "60%",
-        borderRadius: "50%",
         elevation: 1,
     },
     loginbuttonText: {
@@ -182,7 +168,6 @@ const styles = StyleSheet.create({
         borderRadius: 3,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 50,
     },
     modalbutton: {
         width: "40%",

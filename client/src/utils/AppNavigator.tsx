@@ -5,16 +5,16 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import WithinAppNavigator from './WithinAppNavigator';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import ProfileFormScreen from '../screens/ProfileFormScreen';
-import Messaging from '../screens/MessagingScreen';
-
+import MessagingScreen from '../screens/MessagingScreen';
+import { Chat } from '../interfaces/app_interfaces';
 export type RootStackParamList={
+    "MessagingScreen":{chat:Chat};
     "SignIn":undefined;
     "SignUp":undefined;
     "ForgotPassword":undefined;
     "WithinAppNavigator":undefined;
     "ChangePassword":undefined;
     "ProfileFormScreen":undefined
-    "Messaging":undefined;
 }
 
 const {Navigator,Screen,Group}=createNativeStackNavigator<RootStackParamList>();
@@ -27,7 +27,7 @@ const AppNavigator=()=>{
                 <Screen name="SignUp" component={SignUpScreen}/>
                 <Screen name="ForgotPassword" component={ForgotPasswordScreen}/>
                 <Screen name="WithinAppNavigator" component={WithinAppNavigator}/>
-                <Screen name="Messaging" component={Messaging}/>
+                <Screen name="MessagingScreen" component={Messaging}/>
                 <Screen name="ChangePassword" component={ChangePasswordScreen}/>
                 <Screen name="ProfileFormScreen" component={ProfileFormScreen}/>
             </Group>

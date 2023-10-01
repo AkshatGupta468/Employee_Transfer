@@ -32,6 +32,7 @@ export default function SignInScreen({route,navigation}:SignInProps) {
         setAppTheme(currTheme.dark)
         checkToken() 
     },[])
+    
     const popScreen=(screenName:string)=>{
         navigation.dispatch(
             StackActions.replace(screenName)

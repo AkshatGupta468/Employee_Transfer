@@ -97,7 +97,7 @@ export default function ProfileFormScreen({route,navigation}:ScreenProps){
             </View>
             <Toast/>
             {loading?<ActivityIndicator animating={loading} hidesWhenStopped={true} color={'#25D366'} size={'large'} style={AppStyles.loading}/>:<View/>}
-             <TextInput style={AppStyles.textInput} mode='outlined' label="Name" onChangeText={setName} multiline={false} activeOutlineColor={colors['dark-grey']} outlineColor={colors.black} ></TextInput>
+             <TextInput style={{alignSelf:'center',marginTop:40,borderColor:colors["light-grey"],width:250,height:50,paddingHorizontal:5,backgroundColor:'#c0c0c0',fontSize:16}} mode='outlined' label="Name" onChangeText={setName} multiline={false} activeOutlineColor={colors['dark-grey']} outlineColor={colors.black} ></TextInput>
              <SelectList
                         boxStyles={{borderRadius:4,alignItems:'center',borderColor:colors.black,width:250,height:50,backgroundColor:colors['light-grey'],marginTop:20,alignSelf:'center'}}
                         dropdownStyles={{width:250,alignSelf:'center'}}

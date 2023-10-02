@@ -89,14 +89,21 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 })
 
 exports.getEmployees = catchAsync(async (req, res, next) => {
-  const currUser = await Users.findById(req.user._id)
-  console.log(currUser)
-  const curLocation = currUser.location
+  const user = req.user
+  const locations = req.query.locations
+  if (!locations) {
+    new AppError(400, {
+      misc: {
+        name: "LOCATIONS_REQUIRED",
+        message: "Preferred locations of user is required",
+      },
+    })
+  }
   const users = await Users.find()
     .where("location")
-    .in(currUser.preferredLocations)
+    .in(locations)
     .where("preferredLocations")
-    .equals(curLocation)
+    .equals(user.location)
     .where("deactivated")
     .equals(false)
   res.status(200).json({

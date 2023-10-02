@@ -25,13 +25,7 @@ userRouter.patch("/updatePassword", authController.updatePassword)
 
 userRouter.use(userController.userInformationValidator)
 
-userRouter
-  .route("/employees")
-  .get(
-    userController.userInformationValidator,
-    authController.protect,
-    userController.getEmployees
-  )
+userRouter.route("/employees").get(userController.getEmployees)
 
 userRouter.route("/chat").get(chatController.getChat)
 userRouter.route("/message").post(chatController.newMessage)

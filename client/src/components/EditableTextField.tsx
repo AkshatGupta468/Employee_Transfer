@@ -78,7 +78,6 @@ export default function EditableTextField(input:EditableTextFieldParams){
         if(token===null){
             goToSignInPage({route,navigation})
         }else{
-            console.log("HERE")
             input.setLoading(true)
             var patchData
             if(input.fieldName==='Name'){
@@ -107,6 +106,7 @@ export default function EditableTextField(input:EditableTextFieldParams){
                 Toast.show({type:'success',text1:'Saved Profile Successfully',position:'bottom'})
                 input.setLoading(false)
             }).catch((error)=>{
+                input.setLoading(false)
                 let errorData=error.response.data;
                 let {name,message}=getError(errorData);
                 Toast.show({type:'error',text1:message});

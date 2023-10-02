@@ -4,7 +4,6 @@ import { Feather} from '@expo/vector-icons';
 import {  SelectList } from 'react-native-dropdown-select-list';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../interfaces/app_interfaces';
-
 import { getToken,saveToken,removeToken } from '../utils/TokenHandler';
 import { BACKEND_BASE_URL } from '@env';
 import axios from 'axios';
@@ -17,7 +16,7 @@ import EditableTextField from '../components/EditableTextField';
 import { AntDesign,Ionicons,MaterialCommunityIcons } from '@expo/vector-icons'; 
 import UploadImageField from '../components/UploadImageField';
 import ChangePasswordScreen from './ChangePasswordScreen';
-import { getUserData } from '../utils/LocalStorageHandler';
+import { clearUserData, getUserData } from '../utils/LocalStorageHandler';
 import { AppStyles } from '../utils/AppStyles';
 
 const helpName=`This is not your username or pin.This name will be visible to other users`;
@@ -56,11 +55,6 @@ interface profileStates{
 
 type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigator">;
 
-const goToSignInPage=({route,navigation}:TabsScreenProps)=>{
-    Toast.show({type:'error',text1:"Log In again to continue"})
-    navigation.dispatch(StackActions.replace("SignIn"))
-    navigation.navigate("SignIn");
-}
 
 export default function ProfileScreen({route,navigation}:TabsScreenProps){
     const [name,setName]=useState<string>('');
@@ -74,31 +68,30 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
         setPreferredLocations:setPreferredLocations,
         setLoading:setLoading
     }
+    const goToSignInPage=()=>{
+        Toast.show({type:'error',text1:"Log In again to continue"})
+        navigation.dispatch(StackActions.replace("SignIn"))
+        navigation.navigate("SignIn");
+    }
     useEffect(()=>{
         getProfile()
-    },[])
-
+    },[currentUser])
     const getProfile=async()=>{
         const token=await getToken();
         if(token===null){
             console.log("empty token")
-            goToSignInPage({route,navigation})
+            goToSignInPage()
         }
-        setLoading(true)
-        await getUserData().then(
-            (userData)=>{
-            console.log(userData)
-            if(userData && userData.name && userData.location){
-                setName(userData.name)
-                setLocation(userData.location)
-                setEmail(userData.email)
-                setPreferredLocations(userData.preferredLocations)
-                Toast.show({type:'success',text1:'Recieved Profile Successfully',position:'bottom'})
-            }
-            setLoading(false)
-            }).catch(error=>{
-            Toast.show({type:'error',text1:"Couldn't retrieve profile"});
-        })
+        if(currentUser && currentUser.name){
+            setName(currentUser.name)
+        }
+        if(currentUser && currentUser.location){
+            setLocation(currentUser.location)
+        }if(currentUser && currentUser.email){
+            setEmail(currentUser.email)
+        }if(currentUser && currentUser.preferredLocations){
+            setPreferredLocations(currentUser.preferredLocations)
+        }
     }
     const [visible, setVisible] = React.useState(false);
 
@@ -119,17 +112,17 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
             const token=await getToken();
             if(token===null){
                 console.log("empty token")
-                goToSignInPage({route,navigation})
+                goToSignInPage()
             }
             await axios.patch(`${BACKEND_BASE_URL}/profile`,{deactivated:true},{headers:{Authorization:`Bearer ${token}`}}).
             then(response=>{
                 console.log(response.data)
                 removeToken();
-                goToSignInPage({route,navigation})
+                goToSignInPage()
             }).catch(error=>{
             if(getError(error.response.data).name==='USER_DELETED'){
                 removeToken()
-                goToSignInPage({route,navigation})
+                goToSignInPage()
             }
             Toast.show({type:'error',text1:"Couldn't retrieve profile"});
         })
@@ -147,7 +140,8 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
             },
             {text: 'OK', onPress: () => {
                 removeToken();
-                goToSignInPage({route,navigation})
+                clearUserData();
+                goToSignInPage()
             }},
           ]);
     }

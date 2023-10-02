@@ -40,49 +40,54 @@ const data = [
 
 type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigator">;
 
-const goToSignInPage=({route,navigation}:TabsScreenProps)=>{
-    Toast.show({type:'error',text1:"Log In again to continue"})
-    navigation.dispatch(StackActions.replace("SignIn"))
-    navigation.navigate("SignIn");
-}
 
 export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
-    const [selectedDestinationLocation,setSelectedDestinationLocation]=useState([]);
+    const [selectedDestinationLocation,setSelectedDestinationLocation]=useState(currentUser.preferredLocations);
     const [users,setUsers]=useState([]);
     const [userData,setUserData]=useState<User[]>([]);
     const [loading,setLoading]=useState(false);
-
-    const onNewChatHandler= async (sentTo:User)=>{
-        // const currentUser= await getUserData()
-        // if(currentUser instanceof User){
-        //     navigation.navigate("MessagingScreen",{
-        //         chat:{
-        //             createdBy:currentUser,
-        //             participants:[sentTo],
-        //             title:sentTo.name
-        //         }
-        //     })
-        // }
-        
+    const goToSignInPage=()=>{
+        Toast.show({type:'error',text1:"Log In again to continue"})
+        navigation.dispatch(StackActions.replace("SignIn"))
+        // navigation.navigate("SignIn.post(userController.postImmediateProfile)");
     }
-
+    const onNewChatHandler= async (sentTo:User)=>{
+        console.log(currentUser)
+        if(currentUser){
+            navigation.navigate("MessagingScreen",{
+                chatThumb:{
+                    createdBy:currentUser._id,
+                    participants:[sentTo._id],
+                    title:sentTo.name,
+                }
+            })
+        }
+    }
+    
     const getUsers=async(place:string[])=>{
-        let token=await getToken();
             if(token===null){
-                goToSignInPage({route,navigation})
+                goToSignInPage()
             }else{
                 setLoading(true)
-                axios.get(`${BACKEND_BASE_URL}/employees/${place}`,{headers:{Authorization:`Bearer ${token}`}})
+                const config={
+                    params:{locations:selectedDestinationLocation},
+                    headers:{Authorization:`Bearer ${token}`}
+                }
+                console.log(config)
+                axios.get(`${BACKEND_BASE_URL}/employees`,
+                config)
                 .then(response=>{
                     let usersData=response.data.data.users
                     setUserData(usersData)
                     setLoading(false)
+                    console.log(usersData)
                     Toast.show({type:'success',text1:'Recieved Profiles Successfully',position:'bottom'})
                 }).catch((error)=>{
+                    setLoading(false);
                     console.log(error)
                     if(getError(error.response.data).name==='USER_DELETED'){
                         removeToken();
-                        goToSignInPage({route,navigation})
+                        goToSignInPage()
                     }
                     let errorData=error.response.data;
                     console.log(errorData)
@@ -114,7 +119,7 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
                     getUsers(selectedDestinationLocation)
                 }
             }}/>
-            <FlatList data={userData} renderItem={(e)=>(<ListItem user={e.item} />)} keyExtractor={(item:User)=>(item.email)}/>
+            <FlatList data={userData} renderItem={(e)=>(<ListItem onNewChatHandler={onNewChatHandler} user={e.item} />)} keyExtractor={(item:User)=>(item.email)}/>
             <Toast/>
         </SafeAreaView>
     )

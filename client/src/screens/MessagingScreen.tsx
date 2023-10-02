@@ -1,89 +1,73 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { View, TextInput, Text, FlatList, Pressable } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../interfaces/app_interfaces';
+import { Chat, RootStackParamList } from '../interfaces/app_interfaces';
 
 import MessageComponent from "../components/MessageComponent";
 import { MessagingStyles } from "../utils/styles";
-import {Message, User,Chat} from "../interfaces/app_interfaces"
+import {Message} from "../interfaces/app_interfaces"
+import api from '../utils/api'
+
 type MessagingProps=NativeStackScreenProps<RootStackParamList,"MessagingScreen">;
 
 const MessagingScreen = ({ route, navigation }:MessagingProps) => {
-    const [chatMessages, setChatMessages] = useState<Message[]>([
-        {
-            id: "1",
-            content: "Hello guys, welcome!",
-            timestamp: "07:50",
-            sender: "Tomer",
-            chatId:"asdf"
-        },
-        {
-            id: "2",
-            content: "Hi Tomer, thank you! 😇",
-            timestamp: "08:50",
-            sender: "David",
-            chatId:"asdf",
-        },
-    ]);
+    const {chatThumb}=route.params;
+    const [chat,setChat]=useState<Chat>()
+    useEffect(()=>{
+        if(chatThumb._id){
+            api.getChat(chatThumb._id).then((data)=>{
+                console.log(data)
+                if(data.status=="success"){
+                    setChat(data.data.chat)
+                }
+            })
+        }
+    },[chatThumb])
+
+    const appendNewMessage=(message:Message)=>{
+        setChat((chat)=>{
+            chat?.messages?.push(message)
+            return chat;
+        })
+    }
 
     const [sendText, setSendText] = useState("");
-    const [user, setUser] = useState<User>({
-        id:"1",
-        name:"Tomer",
-        location:"Banglore",
-        role:"user",
-        email:"tomer@gmail.com",
-    });
 
-    //👇🏻 Access the chatroom's name and id
-
-//👇🏻 This function gets the username saved on AsyncStorage
-    const getUsername = async () => {
-        try {
-            // const value = await AsyncStorage.getItem("username");
-            // if (value !== null) {
-            //     setUser(value);
-            // }
-        } catch (e) {
-            console.error("Error while loading username!");
+    const handleNewMessage = async () => {      
+        let data:any;
+        if(chat?._id){
+            data = await api.sendMessage({
+                chatId:chat._id,
+                content:sendText
+            })
         }
-    };
+        else{
+            data = await api.sendMessage({
+                sendTo:chatThumb.participants[0],
+                content:sendText
+            })
+        }
 
-    //👇🏻 Sets the header title to the name chatroom's name
-    useLayoutEffect(() => {
-        console.log(props)
-        // navigation.setOptions({ title: name });
-        // getUsername()
-    }, []);
-
-    const handleNewMessage = () => {
-        console.log({
-            sendText,
-            user,
-        });
-        
-        setChatMessages((chatMessages)=>{
-            const {chat,sendTo}=route.params;
-
-            const newMessage:Message={
-                id:"4",
-                content:sendText,
-                sender: user.name as String,
-                chatId:chat.id,
-                timestamp:new Date().getHours().toString(),
+        console.log(data)
+        if(data && data.status=="success"){
+            const {newMessageID,chatId}=data.data;
+            data = await api.getMessage(newMessageID,chatId)
+            if(data.status=="success"){
+                const newMessage:Message= data.data.message
+                appendNewMessage(newMessage)
+                setSendText("")
             }
-            chatMessages.push(newMessage);
-            return chatMessages;
-        })
-        setSendText("");
+        }
+        
+
     };
 
     return (
         <View style={MessagingStyles.messagingscreen}>
             <View style={MessagingStyles.chattopContainer}>
                 <View style={MessagingStyles.chatheader}>
-                    <Text style={MessagingStyles.chatheading}> {route.params.chat.title} </Text>
+                    <Text style={MessagingStyles.chatheading}> {chat?.title} </Text>
                 </View>
             </View>
             <View
@@ -92,13 +76,13 @@ const MessagingScreen = ({ route, navigation }:MessagingProps) => {
                     { paddingVertical: 15, paddingHorizontal: 10 },
                 ]}
             >
-                {chatMessages[0] ? (
+                { (chat?.messages?.[0]) ? (
                     <FlatList
-                        data={chatMessages}
+                        data={chat?.messages}
                         renderItem={(e) => (
-                            <MessageComponent message={e.item} user={user} />
+                            <MessageComponent message={e.item} />
                         )}
-                        keyExtractor={(item,index)=>{return  String(item.chatId)}}
+                        keyExtractor={(item,index)=>{return  String(item._id)}}
                     />
                 ) : (
                     ""
@@ -109,13 +93,14 @@ const MessagingScreen = ({ route, navigation }:MessagingProps) => {
                 <TextInput
                     style={MessagingStyles.messaginginput}
                     onChangeText={(value) => setSendText(value)}
+                    value={sendText}
                 />
                 <Pressable
                     style={MessagingStyles.messagingbuttonContainer}
                     onPress={handleNewMessage}
                 >
                     <View>
-                        <Text style={{ color: "#f2f0f1", fontSize: 15 }}>SEND</Text>
+                        <Text style={{ color: "#f2f0f1", fontSize: 15 }}>Send</Text>
                     </View>
                 </Pressable>
             </View>

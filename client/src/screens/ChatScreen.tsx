@@ -1,64 +1,39 @@
 import React, { useEffect,useState } from "react";
 import { View, Text, Pressable, SafeAreaView, FlatList } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 
 import ChatComponent from "../components/ChatComponent";
 import Modal from "./Modal";
-import { Chat } from "../interfaces/app_interfaces";
-const ChatScreen = () => {
-    const [visible, setVisible] = useState(false);
-    //👇🏻 Dummy list of rooms
-    const rooms:[Chat] = [
-        {
-            id: "1",
-            title:'ad',
-            messages: [
-                {
-                    id: "2",
-                    content: "Hi Tomer, thank you! 😇",
-                    timestamp: "08:50",
-                    sender: "David",
-                    chatId:"asdf",
-                }],
-            participants:[{
-                id:"1",
-                name:"Tomer",
-                location:"Banglore",
-                role:"user",
-                email:"tomer@gmail.com",
-            }],
-            createdBy:{
-                    id:"1",
-                    name:"Tomer",
-                    location:"Banglore",
-                    role:"user",
-                    email:"tomer@gmail.com",
-            },
-        },
-    ];
+import { Chat, ChatThumb } from "../interfaces/app_interfaces";
 
+const ChatScreen = ({chatsList,onChatOpen,refreshChatList}:
+    {chatsList:[ChatThumb]|undefined,
+        onChatOpen:(chatThumb:ChatThumb)=>void,
+        refreshChatList:()=>void}) => {
+
+    const [visible, setVisible] = useState(false);
     return (
         <SafeAreaView style={styles.chatscreen}>
             <View style={styles.chattopContainer}>
                 <View style={styles.chatheader}>
                     <Text style={styles.chatheading}> Chats</Text>
-                    <Pressable onPress={() => console.log("Button Pressed!")}>
-                        <Feather name='edit' size={24} color='green' />
+                    <Pressable onPress={refreshChatList}>
+                        <MaterialCommunityIcons name='reload' size={24} color='green' />
                     </Pressable>
                 </View>
             </View>
 
             <View style={styles.chatlistContainer}>
-                {rooms.length > 0 ? (
+                {(chatsList && chatsList.length > 0) ? (
                     <FlatList
-                        data={rooms}
-                        renderItem={(e) => <ChatComponent chat={e.item} />}
+                        data={chatsList}
+                        renderItem={(e) => <ChatComponent chatThumb={e.item} onChatOpen={onChatOpen}/>}
                     />
                 ) : (
                     <View style={styles.chatemptyContainer}>
-                        <Text style={styles.chatemptyText}>No rooms created!</Text>
-                        <Text>Click the icon above to create a Chat room</Text>
+                        <Text style={styles.chatemptyText}>No Chats Started!</Text>
+                        <Text>Search Users to Trasfer with and Start Chatting</Text>
                     </View>
                 )}
             </View>

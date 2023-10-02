@@ -29,7 +29,14 @@ export async function  getUserData():Promise<User|undefined>{
         console.log(error);
     }
 }
-
+export async function clearUserData(){
+    try {
+        await AsyncStorage.clear()
+    } catch (error) {
+        console.log('Failed to retrieve user');
+        console.log(error);
+    }
+}
 export async function saveUserData(user:User){
     try{
         AsyncStorage.setItem('user',JSON.stringify(user))

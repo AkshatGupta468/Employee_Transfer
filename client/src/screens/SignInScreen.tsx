@@ -13,7 +13,6 @@ import { getError } from '../utils/ErrorClassifier';
 import PasswordTextField from '../components/PasswordTextField';
 import { colors } from '../utils/colors';
 import { useTheme } from 'react-native-paper';
-import User from '../utils/Datatypes';
 import { saveUserData } from '../utils/LocalStorageHandler';
 import { AppStyles } from '../utils/AppStyles';
 
@@ -23,10 +22,9 @@ type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;
 export default function SignInScreen({navigation}:SignInProps) {
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
-    // @refresh reset
 
     const checkToken=async()=>{
-        let token=await getToken()
+        await getToken()
         if(token!==null){
             await axios.get(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`}})
             .then(response=>{
@@ -34,9 +32,10 @@ export default function SignInScreen({navigation}:SignInProps) {
                     popScreen('ProfileFormScreen');
                     navigation.navigate('ProfileFormScreen')
                 }else{
+                    currentUser=response.data.data.user
                     popScreen('WithinAppNavigator');
                     navigation.navigate('WithinAppNavigator')
-                }                 
+                }
             }).catch(error=>{
                 console.log(error.response.data)
                 Toast.show({type:'error',text1:error})                                
@@ -55,9 +54,11 @@ export default function SignInScreen({navigation}:SignInProps) {
 
     const SignIn=async()=>{
         axios.post(`${BACKEND_BASE_URL}/login`,{email,password})
+        
         .then(async response=>{
             console.log(response.data);
             Toast.show({type:'success',text1:'Logged In Successfully',position:'bottom'})
+            token=response.data.token
             saveToken(response.data.token)
             if(!(response.data.data.user.hasOwnProperty("name"))||!(response.data.data.user.hasOwnProperty("location"))||!(response.data.data.user.hasOwnProperty("preferredLocations"))){
                 console.log("GO to profile form screen")
@@ -72,7 +73,7 @@ export default function SignInScreen({navigation}:SignInProps) {
                     preferredLocations:response.data.data.user.preferredLocations,
                     photo:response.data.data.user.hasOwnProperty("photo")?response.data.data.user.photo:''
                 }
-                await saveUserData(myuser)
+                currentUser=myuser
                 console.log("go within app")
                 popScreen('WithinAppNavigator');
                 navigation.navigate('WithinAppNavigator')

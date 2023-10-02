@@ -1,53 +1,70 @@
 const catchAsync = require("../utils/catchAsync")
 const { chatModel: Chats } = require("../models/chatModel")
 const { MessageModel: Message } = require("../models/messageModel")
+const { UserModel } = require("../models/userModel")
+const AppError = require("../utils/appError")
+const { ObjectId } = require("mongoose").Types
 
-exports.newMessage = catchAsync(async (req, res) => {
+exports.newMessage = catchAsync(async (req, res, next) => {
+  const { sendTo, chatId, content } = req.body
+  const { user } = req
+
   let chat
-  if (!req.body.chatId) {
+  if (!chatId) {
     // chat = await Chats.findOne().elemMatch("participant", (elem) => {
-    //   elem.in([req.body.sentTo, req.user._id])
+    //   elem.in([sentTo, user._id])
     // })
-    if (!req.body.sendTo) {
-      res.status(400).send({
-        status: "fail",
-        message: "SENDTO_ID_REQUIRED",
-      })
+    if (
+      !sendTo ||
+      !ObjectId.isValid(sendTo) ||
+      !(await UserModel.findById(sendTo))
+    ) {
+      return next(
+        new AppError(400, {
+          sendTo: {
+            name: "INVALID_MESSAGE_PARAMS",
+            message: "sendTo Id is missing or chatId is missing",
+          },
+        })
+      )
     }
-    chat = await Chats.findOne()
-      .where("participants")
-      .all([req.body.sentTo, req.user._id])
 
+    chat = await Chats.findOne().where("participants").all([sendTo, user._id])
+    console.log(chat)
     if (!chat) {
+      console.log("Chat doesn't Exists")
       chat = new Chats({
-        createdBy: req.user._id,
-        participants: [req.user._id, req.body.sentTo],
+        createdBy: user._id,
+        participants: [user._id, sendTo],
       })
     }
   } else {
-    chat = await Chats.findById(req.body.chatId)
-      .where("participants")
-      .equals(req.user._id)
+    chat = await Chats.findById(chatId).where("participants").in(user._id)
   }
 
   if (!chat) {
     //send Invalid chat ID error
-    return res.status(400).send({
-      status: "fail",
-      message: "Invalid Chat ID",
-    })
+    return next(
+      new AppError(400, {
+        chatId: {
+          name: "INVALID",
+          message: "Invalid Chat ID",
+        },
+      })
+    )
   }
 
   const newMessage = new Message({
-    sender: req.user._id,
-    content: req.body.content,
+    sender: user._id,
+    content: content,
     chatId: chat._id,
   })
 
+  chat.lastMessage = newMessage
   chat.messages.push(newMessage._id)
   await newMessage.save()
   await chat.save()
-  res.status(200).send({
+  return res.status(200).send({
     status: "success",
     data: {
       newMessageID: newMessage._id,
@@ -56,8 +73,49 @@ exports.newMessage = catchAsync(async (req, res) => {
   })
 })
 
-exports.getChat = catchAsync(async (req, res) => {
-  const chat = await Chats.findById(req.body.chatId).populate("messages")
+exports.getAllChatsOfUser = catchAsync(async (req, res, next) => {
+  let chats = await Chats.find()
+    .where("participants")
+    .in([req.user._id])
+    .populate("participants")
+
+  chats = chats.map((chat) => {
+    if (chat.title) return chat.title
+    for (let i = 0; i < chat.participants.length; i++) {
+      if (chat.participants[i]._id.toString() != req.user._id.toString()) {
+        chat.title = chat.participants[i].name
+        break
+      }
+    }
+    if (!chat.title) chat.title = chat._id
+    return chat
+  })
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      chats,
+    },
+  })
+})
+
+exports.getChat = catchAsync(async (req, res, next) => {
+  const chat = await Chats.findById(req.params.chatId)
+    .where("participants")
+    .in([req.user._id])
+    .populate("messages")
+    .populate("participants")
+
+  if (!chat.title) {
+    for (let i = 0; i < chat.participants.length; i++) {
+      if (chat.participants[i]._id.toString() != req.user._id.toString()) {
+        chat.title = chat.participants[i].name
+        break
+      }
+    }
+  }
+  if (!chat.title) chat.title = chat._id
+
   res.status(200).json({
     status: "success",
     data: {
@@ -66,9 +124,49 @@ exports.getChat = catchAsync(async (req, res) => {
   })
 })
 
-exports.getNewMessages = catchAsync(async (req, res) => {
-  // const newMessages= await Chats.findOne({
-  //     _id: req.body.chatId,
-  //     'message.timestamp'
-  // })
+exports.getMessage = catchAsync(async (req, res, next) => {
+  if (!req.params.messageId) {
+    return next(
+      new AppError(400, {
+        messageId: {
+          name: "REQUIRED",
+          message: "message Id is required",
+        },
+      })
+    )
+  }
+  if (!req.params.chatId) {
+    return next(
+      new AppError(400, {
+        chatId: {
+          name: "REQUIRED",
+          message: "message Id is required",
+        },
+      })
+    )
+  }
+  const { messageId, chatId } = req.params
+  const chat = await Chats.findById(chatId)
+    .where("participants")
+    .equals(req.user._id)
+  if (!chat) {
+    return next(
+      new AppError(400, {
+        chatId: {
+          name: "INVALID",
+          message: "Invalid ChatId",
+        },
+      })
+    )
+  }
+  const message = await Message.findOne({
+    _id: messageId,
+    chatId: chat._id,
+  })
+  return res.status(200).json({
+    status: "success",
+    data: {
+      message,
+    },
+  })
 })

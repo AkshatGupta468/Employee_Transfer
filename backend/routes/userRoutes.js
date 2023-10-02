@@ -27,6 +27,9 @@ userRouter.use(userController.userInformationValidator)
 
 userRouter.route("/employees").get(userController.getEmployees)
 
-userRouter.route("/chat").get(chatController.getChat)
+userRouter.route("/chat/:chatId").get(chatController.getChat)
+userRouter.route("/chat").get(chatController.getAllChatsOfUser)
+
+userRouter.route("/message/:chatId/:messageId").get(chatController.getMessage)
 userRouter.route("/message").post(chatController.newMessage)
 module.exports = userRouter

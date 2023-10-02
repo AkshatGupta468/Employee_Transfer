@@ -9,7 +9,7 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 import { User } from '../interfaces/app_interfaces';
 
 
-export default function ListItem({user,onNewChatHandler}:{user:User,onNewChatHandler:()=>{}}){
+export default function ListItem({user,onNewChatHandler}:{user:User,onNewChatHandler:(sendTo:User)=>void}){
     return(
         <View>
         <View style={styles.item}>
@@ -20,7 +20,7 @@ export default function ListItem({user,onNewChatHandler}:{user:User,onNewChatHan
                 <Text style={styles.itemText}>{user.name}</Text>   
             </View>   
             <View>
-                <Pressable onPress={onNewChatHandler}>
+                <Pressable onPress={()=>{onNewChatHandler(user)}}>
                     <Entypo name={'chat'} size={25} color={'#25D366'}/>    
                 </Pressable>
             </View>

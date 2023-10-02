@@ -2,10 +2,11 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { MessagingStyles } from "../utils/styles";
-import { Message,User } from "../interfaces/app_interfaces";
+import { Message} from "../interfaces/app_interfaces";
 
-export default function MessageComponent({ message, user }:{message:Message,user:User}) {
-    const status = message.sender !== user.name;
+export default function MessageComponent({ message }:{message:Message}) {
+    
+    const status = message.sender !== currentUser._id;
 
     return (
         <View>
@@ -33,7 +34,7 @@ export default function MessageComponent({ message, user }:{message:Message,user
                         <Text>{message.content}</Text>
                     </View>
                 </View>
-                <Text style={{ marginLeft: 40 }}>{message.timestamp}</Text>
+                <Text style={{ marginLeft: 40 }}>{message.createdAt}</Text>
             </View>
         </View>
     );

@@ -1,23 +1,39 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
 import ChatScreen from '../screens/ChatScreen';
-import SignInScreen from '../screens/SignInScreen';
-import SignUpScreen from '../screens/SignUpScreen';
-import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
-import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import ChooseUserScreen from '../screens/ChooseUserScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import {NativeStackScreenProps, createNativeStackNavigator} from '@react-navigation/native-stack';
-import { RootStackParamList } from '../interfaces/app_interfaces';
-
-
+import { Chat, ChatThumb, RootStackParamList } from '../interfaces/app_interfaces';
+import api from '../utils/api';
 
 const Tab=createBottomTabNavigator()
 
 type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigator">;
 
 const Tabs=({route,navigation}:TabsScreenProps)=>{
+    const onChatOpen=(chatThumb:ChatThumb)=>{
+      navigation.navigate("MessagingScreen",{chatThumb})
+    }
+    const [chatsList,setChatsList]=useState<[ChatThumb]>()
+
+    const refreshChatList = ()=>{
+      api.getAllChatsOfUser().then((data)=>{
+        
+        if(data.status=="success" && data.data){
+          setChatsList(data.data.chats)
+        }
+        else{
+          console.log(data)
+        }
+       })
+    }
+    
+    useEffect(()=>{
+       refreshChatList();
+    },[])
+
     return(
     <Tab.Navigator screenOptions={{
       tabBarActiveTintColor:'white',
@@ -27,12 +43,12 @@ const Tabs=({route,navigation}:TabsScreenProps)=>{
       },
       headerShown:false
     }}>
-      <Tab.Screen name={'About Us'}  options={{
+      <Tab.Screen name={'Chats'}  options={{
         tabBarIcon: ({focused})=>(<Feather name='droplet' size={25} color={focused?'white':'#708090'}/>)
       }}>
-        {()=><ChatScreen/>}
+        {()=><ChatScreen chatsList={chatsList} onChatOpen={onChatOpen} refreshChatList={refreshChatList}/>}
       </Tab.Screen>
-      <Tab.Screen name={'Choose User to transfer with'} options={{
+      <Tab.Screen name={'Search'} options={{
         tabBarIcon: ({focused})=>(<Feather name='clock' size={25} color={focused?'white':'#708090'}/>)
       }}>
         {()=><ChooseUserScreen navigation={navigation} route={route}/>}

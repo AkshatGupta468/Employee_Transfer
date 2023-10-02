@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import User from './Datatypes';
+import {User} from '../interfaces/app_interfaces';
 import React,{useState} from 'react';
 
 const delimiter:string='#$'
@@ -12,30 +12,18 @@ const UserParams:User={
     _id:'ID',
 }
 
-function separateAndSaveToArray(inputString: string|null): string[] {
+function separateAndSaveToArray(inputString: String|null): String[] {
     if(inputString===null)return [];
+    inputString=inputString.toString()
     const substrings = inputString.split(delimiter).map(substring => substring.trim());
     return substrings;
 }
 
-export async function getUserData(){
-    console.log('Getting User...')
+export async function  getUserData():Promise<User|undefined>{
     try {
-        let id=await AsyncStorage.getItem(UserParams._id)
-        let name=await AsyncStorage.getItem(UserParams.name);
-        let email=await AsyncStorage.getItem(UserParams.email);
-        let location=await AsyncStorage.getItem(UserParams.location);
-        let preferredLocationsString=await AsyncStorage.getItem(UserParams.preferredLocations[0]);
-        let photo=await AsyncStorage.getItem(UserParams.photo);
-        let user:User={
-            _id:id===null?'':id,
-            name:name===null?'':name,
-            email:email===null?'':email,
-            location:location===null?'':location,
-            photo:photo===null?'':photo,
-            preferredLocations:separateAndSaveToArray(preferredLocationsString)
-        }
-        return user;
+        const userString =await AsyncStorage.getItem('user')
+        if(userString)
+            return JSON.parse(userString)
     } catch (error) {
         console.log('Failed to retrieve user');
         console.log(error);
@@ -44,11 +32,7 @@ export async function getUserData(){
 
 export async function saveUserData(user:User){
     try{
-        AsyncStorage.multiSet([['NAME',user.name],
-        ['LOCATION',user.location],
-        ['PHOTO',user.photo],
-        ['EMAIL',user.email],
-        ['PREFERREDLOCATIONS',user.preferredLocations.join(delimiter)]])
+        AsyncStorage.setItem('user',JSON.stringify(user))
     }catch(error){
         console.log('Failed to store User');
         console.log(error);
@@ -57,7 +41,7 @@ export async function saveUserData(user:User){
 
 export async function removeUserData(){
     try{
-        AsyncStorage.multiRemove(['NAME','LOCATION','PHOTO','EMAIL','PREFERREDLOCATIONS']);
+        AsyncStorage.removeItem('user')
     }catch(error){
         console.log('Failed to remove user');
         console.log(error);
@@ -66,7 +50,11 @@ export async function removeUserData(){
 
 export async function saveUserName(name:string){
     try{
-        AsyncStorage.setItem(UserParams.name,name)
+        const user=await getUserData();
+        if(user){
+            user.name=name;
+            await saveUserData(user)
+        }
     }catch(error){
         console.log('Failed to store name');
         console.log(error);
@@ -75,7 +63,11 @@ export async function saveUserName(name:string){
 
 export async function saveUserPhoto(photo:string){
     try{
-        AsyncStorage.setItem(UserParams.photo,photo)
+        const user=await getUserData();
+        if(user){
+            user.photo=photo;
+            await saveUserData(user)
+        }
     }catch(error){
         console.log('Failed to store photo');
         console.log(error);
@@ -84,7 +76,11 @@ export async function saveUserPhoto(photo:string){
 
 export async function saveUserLocation(location:string){
     try{
-        AsyncStorage.setItem(UserParams.location,location)
+        const user=await getUserData();
+        if(user){
+            user.location=location;
+            await saveUserData(user)
+        }
     }catch(error){
         console.log('Failed to store location');
         console.log(error);
@@ -93,7 +89,11 @@ export async function saveUserLocation(location:string){
 
 export async function saveUserPreferredLocations(locations:string[]){
     try{
-        AsyncStorage.setItem(UserParams.preferredLocations[0],locations.join(delimiter))
+        const user=await getUserData();
+        if(user){
+            user.preferredLocations=locations
+            await saveUserData(user)
+        }
     }catch(error){
         console.log('Failed to store preferred locations');
         console.log(error);

@@ -77,6 +77,7 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
     useEffect(()=>{
         getProfile()
     },[])
+
     const getProfile=async()=>{
         const token=await getToken();
         if(token===null){
@@ -85,16 +86,16 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
         }
         setLoading(true)
         await getUserData().then(
-            response=>{
-            let userData=response
-            if(userData!==undefined){
+            (userData)=>{
+            console.log(userData)
+            if(userData && userData.name && userData.location){
                 setName(userData.name)
                 setLocation(userData.location)
                 setEmail(userData.email)
                 setPreferredLocations(userData.preferredLocations)
-                setLoading(false)
                 Toast.show({type:'success',text1:'Recieved Profile Successfully',position:'bottom'})
             }
+            setLoading(false)
             }).catch(error=>{
             Toast.show({type:'error',text1:"Couldn't retrieve profile"});
         })

@@ -67,7 +67,7 @@ exports.newMessage = catchAsync(async (req, res, next) => {
   return res.status(200).send({
     status: "success",
     data: {
-      newMessageID: newMessage._id,
+      newMessageId: newMessage._id,
       chatId: chat._id,
     },
   })
@@ -100,12 +100,28 @@ exports.getAllChatsOfUser = catchAsync(async (req, res, next) => {
 })
 
 exports.getChat = catchAsync(async (req, res, next) => {
-  const chat = await Chats.findById(req.params.chatId)
-    .where("participants")
-    .in([req.user._id])
-    .populate("messages")
-    .populate("participants")
-
+  let chat
+  if (req.params.chatId) {
+    chat = await Chats.findById(req.params.chatId)
+      .where("participants")
+      .all([req.user._id])
+      .populate("messages")
+      .populate("participants")
+  } else if (req.params.sendTo) {
+    chat = await Chats.findOne()
+      .where("participants")
+      .all([req.user._id, req.params.sendTo])
+      .populate("messages")
+      .populate("participants")
+  }
+  if (!chat) {
+    return new AppError(400, {
+      misc: {
+        name: "INVALID",
+        message: "chatId or sendTo Required",
+      },
+    })
+  }
   if (!chat.title) {
     for (let i = 0; i < chat.participants.length; i++) {
       if (chat.participants[i]._id.toString() != req.user._id.toString()) {
@@ -114,6 +130,7 @@ exports.getChat = catchAsync(async (req, res, next) => {
       }
     }
   }
+
   if (!chat.title) chat.title = chat._id
 
   res.status(200).json({

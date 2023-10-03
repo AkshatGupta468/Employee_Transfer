@@ -34,6 +34,32 @@ io.on("connection", (socket) => {
   socket.on("new-message", (...data) => {
     console.log(data)
   })
+  socket.on("join", (data) => {
+    const { userId, username, roomId } = data
+    socket.join(roomId)
+    console.log(`User ${username} of ${userId} has joined the chat ${roomId}`)
+    io.to(roomId).emit("info", {
+      text: `User ${username} of ${userId} has joined the chat ${roomId}`,
+    })
+  })
+  socket.on("new-message", (data) => {
+    console.log("socket event of new message with data")
+    console.log(data)
+    socket.to(data.chatId).emit("new-message", data)
+  })
+
+  socket.on("logged-in", ({ userId }) => {
+    console.log(`logged-in userId:${userId}`)
+    socket.join(userId)
+  })
+  socket.on("new-chat", ({ userId }) => {
+    console.log(`new-chat with user ${userId}`)
+    socket.to(userId).emit("new-chat")
+  })
+
+  socket.on("disconnect", (data) => {
+    console.log(`socket ${socket.id} disconnected`)
+  })
 })
 
 process.on("unhandledRejection", (err) => {

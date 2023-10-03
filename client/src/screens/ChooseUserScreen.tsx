@@ -1,9 +1,9 @@
-import React,{useEffect, useState} from 'react'
+import React,{ useState} from 'react'
 import { Feather } from '@expo/vector-icons';
-import { FlatList, SafeAreaView, ScrollView,StyleSheet,Dimensions, View } from 'react-native';
+import { FlatList, SafeAreaView, View } from 'react-native';
 import ListItem from '../components/ListItem';
-import {  MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
-import { getToken, removeToken } from '../utils/TokenHandler';
+import {  MultipleSelectList } from 'react-native-dropdown-select-list';
+import { removeToken } from '../utils/TokenHandler';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../interfaces/app_interfaces';
@@ -13,28 +13,25 @@ import axios from 'axios';
 import { getError } from '../utils/ErrorClassifier';
 import { ActivityIndicator, Surface } from 'react-native-paper';
 import { BACKEND_BASE_URL } from '@env';
-import {User} from '../interfaces/app_interfaces'
 import { AppStyles } from '../utils/AppStyles';
-import {getUserData} from '../utils/LocalStorageHandler'
 
 const data = [
-    {key:'Bangalore',value:'Bangalore'},
-    {key:'1',value:'Jammu & Kashmir'},
-    {key:'2',value:'1'},
-    {key:'3',value:'Maharashtra'},
-    {key:'4',value:'Goa'},
-    {key:'5',value:'X'},
-    {key:'6',value:'Y'},
-    {key:'7',value:'Z'},
-    {key:'8',value:'W'},
-    {key:'9',value:'A'},
-    {key:'10',value:'B'},
-    {key:'11',value:'C'},
-    {key:'12',value:'D'},
-    {key:'13',value:'E'},
-    {key:'14',value:'F'},
-    {key:'15',value:'G'},
-    {key:'16',value:'H'},
+    {key:'1',value:'1'},
+    {key:'2',value:'2'},
+    {key:'3',value:'3'},
+    {key:'4',value:'4'},
+    {key:'5',value:'5'},
+    {key:'6',value:'6'},
+    {key:'7',value:'7'},
+    {key:'8',value:'8'},
+    {key:'9',value:'9'},
+    {key:'10',value:'10'},
+    {key:'11',value:'11'},
+    {key:'12',value:'12'},
+    {key:'13',value:'13'},
+    {key:'14',value:'14'},
+    {key:'15',value:'15'},
+    {key:'16',value:'16'},
   ];
 
 
@@ -42,23 +39,27 @@ type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigat
 
 
 export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
-    const [selectedDestinationLocation,setSelectedDestinationLocation]=useState(currentUser.preferredLocations);
+    const [selectedDestinationLocation,setSelectedDestinationLocation]=useState(currentUser?.preferredLocations||[]);
     const [users,setUsers]=useState([]);
     const [userData,setUserData]=useState<User[]>([]);
     const [loading,setLoading]=useState(false);
     const goToSignInPage=()=>{
         Toast.show({type:'error',text1:"Log In again to continue"})
         navigation.dispatch(StackActions.replace("SignIn"))
-        // navigation.navigate("SignIn.post(userController.postImmediateProfile)");
     }
-    const onNewChatHandler= async (sentTo:User)=>{
-        console.log(currentUser)
-        if(currentUser){
+    // @refrese reset
+    const onNewChatHandler= async (sendTo:User)=>{
+        console.log("new-chat with")
+        console.log(sendTo)
+        if(!currentUser){
+            goToSignInPage()
+        }
+        else {
             navigation.navigate("MessagingScreen",{
                 chatThumb:{
                     createdBy:currentUser._id,
-                    participants:[sentTo._id],
-                    title:sentTo.name,
+                    participants:[sendTo._id],
+                    title:sendTo.name,
                 }
             })
         }

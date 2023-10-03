@@ -6,7 +6,7 @@ import { Message} from "../interfaces/app_interfaces";
 
 export default function MessageComponent({ message }:{message:Message}) {
     
-    const status = message.sender !== currentUser._id;
+    const status = message.sender !== currentUser?._id;
 
     return (
         <View>
@@ -22,7 +22,6 @@ export default function MessageComponent({ message }:{message:Message}) {
                         name='person-circle-outline'
                         size={30}
                         color='black'
-                        style={MessagingStyles.mavatar}
                     />
                     <View
                         style={

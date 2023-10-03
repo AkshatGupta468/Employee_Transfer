@@ -1,13 +1,13 @@
 import axios from "axios"
-import { BACKEND_BASE_URL } from "@env"
-
+import { BACKEND_BASE_URL, SOCKET_BASE_URL } from "@env"
+import socket, { JOIN, NEW_MESSAGE } from "./socket"
+import { Chat, ChatThumb, Message, id } from "../interfaces/app_interfaces"
 const api = axios.create({
   baseURL: BACKEND_BASE_URL,
 })
 
 api.interceptors.request.use(
   (config) => {
-    console.log("interceptor, token : ", token)
     config.headers.Authorization = `Bearer ${token}`
     return config
   },
@@ -20,50 +20,85 @@ const sendMessage = async (
   body:
     | { sendTo: String; content: String }
     | { chatId: String; content: String }
-) => {
+): Promise<{ newMessageId: id; chatId: id }> => {
   return await api
     .post("message", body)
     .then((res) => {
-      return res.data
+      const messagedata = res.data.data
+      socket.emit(NEW_MESSAGE, messagedata)
+      return messagedata
     })
     .catch((err) => {
       return err.response.data
     })
 }
 
-const getMessage = async (messageId: String, chatId: String) => {
+const getMessage = async (
+  newMessageId: String,
+  chatId: String
+): Promise<Message> => {
   return await api
-    .get(`message/${chatId}/${messageId}`)
+    .get(`message/${chatId}/${newMessageId}`)
     .then((res) => {
-      return res.data
+      const message: Message = res?.data?.data?.message
+      console.log(message)
+      return message
     })
     .catch((err) => {
-      return err.response.data
+      if (err.response) return err.response.data
     })
 }
 
-const getAllChatsOfUser = async () => {
+const getAllChatsOfUser = async (): Promise<[ChatThumb]> => {
   console.log("Getting All Chats")
   return await api
     .get(`chat`)
     .then((res) => {
-      console.log(res.data)
-      return res.data
+      const chatsThumbs: [ChatThumb] = res?.data?.data?.chats
+      chatsThumbs.forEach((chatThumb) => {
+        if (chatThumb._id) {
+          socket.emit(JOIN, {
+            userId: currentUser._id,
+            username: currentUser.name,
+            roomId: chatThumb._id,
+          })
+        }
+      })
+      return chatsThumbs
     })
     .catch((err) => {
-      return err.response.data
+      if (err.response) return err.response.data
     })
 }
 
-const getChat = async (chatId: String) => {
+const getChat = async (chatId: id): Promise<Chat> => {
   return await api
     .get(`chat/${chatId}`)
     .then((res) => {
-      return res.data
+      const chat: Chat = res?.data.data.chat
+      return chat
     })
     .catch((err) => {
       return err.response.data
     })
 }
 
-export default { sendMessage, getMessage, getAllChatsOfUser, getChat }
+const getChatSendTo = async (sendTo: id): Promise<Chat> => {
+  return await api
+    .get(`chat/sendTo/${sendTo}`)
+    .then((res) => {
+      const chat: Chat = res?.data.data.chat
+      return chat
+    })
+    .catch((err) => {
+      return err.response.data
+    })
+}
+
+export default {
+  sendMessage,
+  getMessage,
+  getAllChatsOfUser,
+  getChat,
+  getChatSendTo,
+}

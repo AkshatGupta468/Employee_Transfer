@@ -97,6 +97,7 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
             console.log(message)
         })
     }
+    
     return(
         <View style={AppStyles.container}>
             <View style={[AppStyles.topMostItem,AppStyles.roundIcon]}>

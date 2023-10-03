@@ -9,6 +9,7 @@ import { RootStackParamList } from '../interfaces/app_interfaces';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../utils/colors';
+import { BACKEND_BASE_URL } from '@env';
 
 
 type ScreenProps=NativeStackScreenProps<RootStackParamList,"ForgotPassword">;
@@ -16,7 +17,6 @@ type ScreenProps=NativeStackScreenProps<RootStackParamList,"ForgotPassword">;
 export default function ForgotPasswordScreen({navigation,route}:ScreenProps){
     console.log("I'm in Forgot Password");
     const [email,setEmail]=useState('');
-    const BACKEND_BASE_URL=`http://10.10.5.131:3000/api/v1/users`;
 
     const sendMail=(email:String)=>{
         axios.post(`${BACKEND_BASE_URL}/forgotPassword`,{email})

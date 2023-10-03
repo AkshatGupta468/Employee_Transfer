@@ -13,4 +13,4 @@ declare interface User {
 }
 
 var token: String | null
-var currentUser: User
+var currentUser: User | null

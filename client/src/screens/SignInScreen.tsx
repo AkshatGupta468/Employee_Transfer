@@ -13,7 +13,6 @@ import { getError } from '../utils/ErrorClassifier';
 import PasswordTextField from '../components/PasswordTextField';
 import { colors } from '../utils/colors';
 import { useTheme } from 'react-native-paper';
-import { saveUserData } from '../utils/LocalStorageHandler';
 import { AppStyles } from '../utils/AppStyles';
 
 
@@ -54,9 +53,7 @@ export default function SignInScreen({navigation}:SignInProps) {
 
     const SignIn=async()=>{
         axios.post(`${BACKEND_BASE_URL}/login`,{email,password})
-        
         .then(async response=>{
-            console.log(response.data);
             Toast.show({type:'success',text1:'Logged In Successfully',position:'bottom'})
             token=response.data.token
             saveToken(response.data.token)

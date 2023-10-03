@@ -27,6 +27,7 @@ userRouter.use(userController.userInformationValidator)
 
 userRouter.route("/employees").get(userController.getEmployees)
 
+userRouter.route("/chat/sendTo/:sendTo").get(chatController.getChat)
 userRouter.route("/chat/:chatId").get(chatController.getChat)
 userRouter.route("/chat").get(chatController.getAllChatsOfUser)
 

@@ -31,7 +31,6 @@ export interface ChatThumb {
   _id?: id
   title: String
   lastMessage?: Message
-  messages?: [id]
   participants: [id]
   createdBy: id
 }

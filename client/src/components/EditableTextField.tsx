@@ -14,7 +14,6 @@ import { BACKEND_BASE_URL } from '@env';
 import { getError } from '../utils/ErrorClassifier';
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { colors } from '../utils/colors';
-import { saveUserLocation, saveUserName, saveUserPreferredLocations } from '../utils/LocalStorageHandler';
 import { AppStyles } from '../utils/AppStyles';
 
 interface EditableTextFieldParams{
@@ -74,7 +73,6 @@ export default function EditableTextField(input:EditableTextFieldParams){
             bottomDrawerRef.current?.open(150)      
     }
     const SaveProfile=async()=>{
-        let token=await getToken();
         if(token===null){
             goToSignInPage({route,navigation})
         }else{
@@ -82,7 +80,6 @@ export default function EditableTextField(input:EditableTextFieldParams){
             var patchData
             if(input.fieldName==='Name'){
                 patchData={name:newValue};
-                console.log("NAME")
             }else if(input.fieldName==='Location'){
                 patchData={location:newValue};
             }else{
@@ -91,16 +88,12 @@ export default function EditableTextField(input:EditableTextFieldParams){
             bottomDrawerRef.current?.close()
             axios.patch(`${BACKEND_BASE_URL}/profile`,patchData,{headers:{Authorization:`Bearer ${token}`}})
             .then(async response=>{
-                console.log(response.data)
                 if(input.fieldName==='Name'){
                     input.setName(newValue)
-                    await saveUserName(newValue)
                 }else if(input.fieldName==='Location'){
                     input.setLocation(newValue)
-                    await saveUserLocation(newValue)
                 }else if(input.fieldName==='Preferred Locations'){
                     input.setPreferredLocations(newValueObj)
-                    await saveUserPreferredLocations(newValueObj)
                     setValueObj([])
                 }
                 Toast.show({type:'success',text1:'Saved Profile Successfully',position:'bottom'})

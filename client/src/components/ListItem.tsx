@@ -1,12 +1,7 @@
 import React from 'react'
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather,Entypo } from '@expo/vector-icons';
-import { FlatList, SafeAreaView, View,Text,StyleSheet, Pressable, GestureResponderEvent } from 'react-native';
-import { StatusBar } from 'react-native';
+import { View,Text,StyleSheet, Pressable } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { TouchableHighlight } from 'react-native-gesture-handler';
-import { User } from '../interfaces/app_interfaces';
 
 
 export default function ListItem({user,onNewChatHandler}:{user:User,onNewChatHandler:(sendTo:User)=>void}){

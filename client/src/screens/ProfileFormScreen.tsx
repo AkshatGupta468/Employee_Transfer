@@ -18,27 +18,25 @@ import EditableTextField from '../components/EditableTextField';
 import { AntDesign,Ionicons,MaterialCommunityIcons } from '@expo/vector-icons'; 
 import UploadImageField from '../components/UploadImageField';
 import { colors } from '../utils/colors';
-import User from '../utils/Datatypes';
-import { saveUserData } from '../utils/LocalStorageHandler';
 import { AppStyles } from '../utils/AppStyles';
 
 const data = [
-    {key:'1',value:'Jammu & Kashmir'},
-    {key:'2',value:'Gujrat'},
-    {key:'3',value:'Maharashtra'},
-    {key:'4',value:'Goa'},
-    {key:'5',value:'X'},
-    {key:'6',value:'Y'},
-    {key:'7',value:'Z'},
-    {key:'8',value:'W'},
-    {key:'9',value:'A'},
-    {key:'10',value:'B'},
-    {key:'11',value:'C'},
-    {key:'12',value:'D'},
-    {key:'13',value:'E'},
-    {key:'14',value:'F'},
-    {key:'15',value:'G'},
-    {key:'16',value:'H'},
+    {key:'1',value:'1'},
+    {key:'2',value:'2'},
+    {key:'3',value:'3'},
+    {key:'4',value:'4'},
+    {key:'5',value:'5'},
+    {key:'6',value:'6'},
+    {key:'7',value:'7'},
+    {key:'8',value:'8'},
+    {key:'9',value:'9'},
+    {key:'10',value:'10'},
+    {key:'11',value:'11'},
+    {key:'12',value:'12'},
+    {key:'13',value:'13'},
+    {key:'14',value:'14'},
+    {key:'15',value:'15'},
+    {key:'16',value:'16'},
   ];
 
 type ScreenProps=NativeStackScreenProps<RootStackParamList,"ProfileFormScreen">;
@@ -54,9 +52,7 @@ export default function ProfileFormScreen({route,navigation}:ScreenProps){
             StackActions.replace(screenName)
           );
     }
-// @refresh reset
     const saveProfile=async()=>{
-        let token=await getToken()
         console.log(`Token : ${token}`)
         await axios.patch(`${BACKEND_BASE_URL}/profile`,{
             name: name,
@@ -74,7 +70,7 @@ export default function ProfileFormScreen({route,navigation}:ScreenProps){
                 preferredLocations:response.data.data.user.preferredLocations,
                 photo:response.data.data.user.hasOwnProperty("photo")?response.data.data.user.photo:''
             }
-            saveUserData(myuser)
+            currentUser=myuser
             Toast.show({type:'success',text1:'Profile created successfully'})
             popScreen('WithinAppNavigator');
             navigation.navigate('WithinAppNavigator');

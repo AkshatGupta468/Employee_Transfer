@@ -1,24 +1,13 @@
 import React,{useEffect, useState,useRef} from 'react';
-import { Text,View,StyleSheet,StatusBar,TextInput, Pressable,Dimensions, ScrollView, Touchable, TouchableHighlight, Button} from 'react-native';
+import { View,TextInput }  from 'react-native';
 import { Feather} from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import BottomDrawer, {BottomDrawerMethods} from 'react-native-animated-bottom-drawer';
-import { getToken } from '../utils/TokenHandler';
-import { RouteProp, StackActions } from '@react-navigation/native';
-import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../interfaces/app_interfaces';
-
-import Toast from 'react-native-toast-message';
-import axios from 'axios';
-import { BACKEND_BASE_URL } from '@env';
-import { getError } from '../utils/ErrorClassifier';
-import { SelectList } from 'react-native-dropdown-select-list';
 import { AppStyles } from '../utils/AppStyles';
 
 interface props{
     setPassword:React.Dispatch<React.SetStateAction<string>>
     placeHolder:string    
 }
+
 export default function PasswordTextField(input:props){
     const [secure,setSecure]=useState(true);
     return(

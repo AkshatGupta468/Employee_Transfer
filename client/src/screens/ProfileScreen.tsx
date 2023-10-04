@@ -16,7 +16,7 @@ import EditableTextField from '../components/EditableTextField';
 import { AntDesign,Ionicons,MaterialCommunityIcons } from '@expo/vector-icons'; 
 import UploadImageField from '../components/UploadImageField';
 import ChangePasswordScreen from './ChangePasswordScreen';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 
 const helpName=`This is not your username or pin.This name will be visible to other users`;
 

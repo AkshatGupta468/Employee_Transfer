@@ -18,7 +18,7 @@ import EditableTextField from '../components/EditableTextField';
 import { AntDesign,Ionicons,MaterialCommunityIcons } from '@expo/vector-icons'; 
 import UploadImageField from '../components/UploadImageField';
 import { colors } from '../utils/colors';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 
 const data = [
     {key:'1',value:'1'},

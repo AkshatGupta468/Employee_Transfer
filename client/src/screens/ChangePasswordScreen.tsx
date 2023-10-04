@@ -10,7 +10,7 @@ import axios from 'axios';
 import { BACKEND_BASE_URL } from '@env';
 import Toast from 'react-native-toast-message';
 import { getError } from '../utils/ErrorClassifier';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 
 type ChangePasswordScreenProps=NativeStackScreenProps<RootStackParamList,"ChangePassword">;
 

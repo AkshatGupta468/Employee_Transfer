@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native"
+import { StatusBar } from "react-native"
 import { colors } from "./colors"
 import { useTheme } from 'react-native-paper';
 
@@ -8,16 +9,56 @@ export function setAppTheme(AppTheme:boolean){
     console.log(theme)
 } 
 
+
 export const AppStyles=StyleSheet.create({
+    container:{
+        marginTop:40,
+        flex:1,
+        backgroundColor:colors.white,
+    },
+    topMostItem:{
+        marginTop:(StatusBar.currentHeight||40)
+    },
+    button:{
+        width:125,
+        height:40,
+        marginTop:40,
+        backgroundColor:'#25D366',
+        justifyContent:'center',
+        alignItems:'center',
+        alignSelf:'center',
+        borderRadius:10,
+    },
+    
+    buttonText:{
+        color:colors.white,
+        fontWeight:'bold',
+        fontSize:16,
+    },
     textInput:{
+        alignSelf:'center',
         marginTop:40,
         borderWidth:2,
         borderRadius:10,
+        borderColor:colors["light-grey"],
         width:250,
         height:50,
         paddingHorizontal:20,
-        backgroundColor:colors.white,
+        backgroundColor:'#c0c0c0',
         fontSize:16,
+        elevation:15
+    },
+    
+    searchBar:{
+        alignSelf:'center',
+        borderWidth:2,
+        borderRadius:10,
+        maxHeight:70,
+        width:300,
+        marginTop:(StatusBar.currentHeight||20),
+        backgroundColor:colors["light-grey"],
+        fontSize:16, 
+        overflow:'hidden'       
     },
     linkText:{
         color:colors.green,
@@ -29,13 +70,36 @@ export const AppStyles=StyleSheet.create({
         height:80,
         borderRadius:40,
         alignItems:'center',
+        alignSelf:'center',
         justifyContent:'center'
     },
     heading:{
-        color:theme?colors.dark:colors.white,
+        alignSelf:'center',
+        color:colors.dark,
         fontSize:24
+    },
+    infoText:{
+        fontSize:16,
+        color:colors.black
+    },
+    loading: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        flex:1,
+        position: 'absolute',
+        alignItems: 'center',
+        justifyContent: 'center'
+      },
+      badgeStyles:{
+        borderRadius:4,
+        paddingHorizontal:10,
+        margin:0,
+        backgroundColor:colors['dark-grey']
     }
 })
+
 
 
 export const MessagingStyles = StyleSheet.create({
@@ -80,25 +144,24 @@ export const MessagingStyles = StyleSheet.create({
         flex: 1,
         padding: 10,
         position: "relative",
+        marginTop:20
     },
     chatheading: {
         fontSize: 24,
         fontWeight: "bold",
-        color: "green",
+        paddingHorizontal:10,
     },
     chattopContainer: {
         backgroundColor: "#F7F7F7",
-        height: 70,
         width: "100%",
-        padding: 20,
+        padding: 10,
         justifyContent: "center",
-        marginBottom: 15,
         elevation: 2,
     },
     chatheader: {
+        minHeight:50,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
     },
     chatlistContainer: {
         paddingHorizontal: 10,
@@ -115,79 +178,47 @@ export const MessagingStyles = StyleSheet.create({
     },
     messaginginputContainer: {
         width: "100%",
-        minHeight: 100,
-        backgroundColor: "white",
-        paddingVertical: 30,
+        elevation: 2,
+        backgroundColor: "#F7F7F7",
+        paddingVertical: 8,
         paddingHorizontal: 15,
         justifyContent: "center",
         flexDirection: "row",
     },
     messaginginput: {
-        borderWidth: 1,
-        padding: 15,
+        borderWidth: 0.4,
+        backgroundColor:'white',
+        padding: 10,
         flex: 1,
+        includeFontPadding:true,
         marginRight: 10,
-        borderRadius: 20,
+        borderRadius: 40,
     },
     messagingbuttonContainer: {
-        width: "30%",
+        width: "25%",
         backgroundColor: "green",
-        borderRadius: 3,
+        borderRadius: 30,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 50,
-    },
-    modalbutton: {
-        width: "40%",
-        height: 45,
-        backgroundColor: "green",
-        borderRadius: 5,
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#fff",
-    },
-    modalbuttonContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 10,
-    },
-    modaltext: {
-        color: "#fff",
-    },
-    modalContainer: {
-        width: "100%",
-        borderTopColor: "#ddd",
-        borderTopWidth: 1,
-        elevation: 1,
-        height: 400,
-        backgroundColor: "#fff",
-        position: "absolute",
-        bottom: 0,
-        zIndex: 10,
-        paddingVertical: 50,
-        paddingHorizontal: 20,
-    },
-    modalinput: {
-        borderWidth: 2,
-        padding: 15,
-    },
-    modalsubheading: {
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 15,
-        textAlign: "center",
     },
     mmessageWrapper: {
         width: "100%",
         alignItems: "flex-start",
         marginBottom: 15,
+        padding:1,
+        paddingHorizontal:10,
     },
     mmessage: {
-        maxWidth: "50%",
-        backgroundColor: "#f5ccc2",
-        padding: 15,
+        maxWidth: "70%",
+        backgroundColor: "rgb(194, 243, 194)",
+        padding: 12,
+        borderWidth:0.4,
+        borderColor:'#709AA0',
+        borderCurve:'continuous',
         borderRadius: 10,
         marginBottom: 2,
+        minWidth:40,
+        elevation:3,
     },
     mvatar: {
         marginRight: 5,
@@ -196,11 +227,13 @@ export const MessagingStyles = StyleSheet.create({
         width: "100%",
         flexDirection: "row",
         alignItems: "center",
+        borderWidth:1,
         borderRadius: 5,
-        paddingHorizontal: 15,
+        padding:2,
+        paddingHorizontal: 10,
         backgroundColor: "#fff",
         height: 80,
-        marginBottom: 10,
+        marginBottom: 10
     },
     cavatar: {
         marginRight: 15,
@@ -213,6 +246,8 @@ export const MessagingStyles = StyleSheet.create({
     cmessage: {
         fontSize: 14,
         opacity: 0.7,
+        maxHeight:"60%",
+        overflow:'hidden'
     },
     crightContainer: {
         flexDirection: "row",

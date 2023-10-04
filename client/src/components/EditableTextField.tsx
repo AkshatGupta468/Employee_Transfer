@@ -14,7 +14,7 @@ import { BACKEND_BASE_URL } from '@env';
 import { getError } from '../utils/ErrorClassifier';
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { colors } from '../utils/colors';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 
 interface EditableTextFieldParams{
     icon:string,

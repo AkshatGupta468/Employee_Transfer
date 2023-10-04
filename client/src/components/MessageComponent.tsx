@@ -3,6 +3,7 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { MessagingStyles } from "../utils/styles";
 import { Message} from "../interfaces/app_interfaces";
+import { showTime } from "../utils/datetimeformat";
 
 export default function MessageComponent({ message }:{message:Message}) {
     
@@ -18,23 +19,19 @@ export default function MessageComponent({ message }:{message:Message}) {
                 }
             >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Ionicons
-                        name='person-circle-outline'
-                        size={30}
-                        color='black'
-                    />
                     <View
-                        style={
-                            status
-                                ? MessagingStyles.mmessage
-                                : [MessagingStyles.mmessage, { backgroundColor: "rgb(194, 243, 194)" }]
-                        }
+                        style={MessagingStyles.mmessage}
                     >
                         <Text>{message.content}</Text>
                     </View>
                 </View>
-                <Text style={{ marginLeft: 40 }}>{message.createdAt}</Text>
+                <Text style={{ 
+                                marginLeft:5,
+                                color: '#888',
+                                fontSize: 11,
+                            }}>{ showTime(message.createdAt)}</Text>
             </View>
         </View>
     );
 }
+

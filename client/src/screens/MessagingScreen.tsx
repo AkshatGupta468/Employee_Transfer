@@ -3,12 +3,15 @@ import { View, TextInput, Text, FlatList, Pressable } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Chat, RootStackParamList, id } from '../interfaces/app_interfaces';
+import { Ionicons } from "@expo/vector-icons";
 
 import MessageComponent from "../components/MessageComponent";
 import { MessagingStyles } from "../utils/styles";
 import {Message} from "../interfaces/app_interfaces"
 import api from '../utils/api'
 import socket, { NEW_CHAT, NEW_MESSAGE } from "../utils/socket";
+import { AppStyles } from "../utils/styles";
+import { PaperProvider } from "react-native-paper";
 
 type MessagingProps=NativeStackScreenProps<RootStackParamList,"MessagingScreen">;
 
@@ -88,18 +91,24 @@ const MessagingScreen = ({ route, navigation }:MessagingProps) => {
 
     
     return (
+        <View style={AppStyles.container}>
+            <PaperProvider>
         <View style={MessagingStyles.messagingscreen}>
             <View style={MessagingStyles.chattopContainer}>
                 <View style={MessagingStyles.chatheader}>
+                    <Ionicons
+                        name='person-circle-outline'
+                        size={45}
+                        color='black'
+                    /> 
                     <Text style={MessagingStyles.chatheading}> {chatThumb?.title} </Text>
                 </View>
             </View>
             <View
                 style={[
-                    MessagingStyles.messagingscreen,
-                    { paddingVertical: 15, paddingHorizontal: 10 },
+                    MessagingStyles.messagingscreen
                 ]}
-            >
+                >
                 { (chat?.messages?.[0]) ? (
                     <FlatList
                         data={chat?.messages}
@@ -107,10 +116,10 @@ const MessagingScreen = ({ route, navigation }:MessagingProps) => {
                             <MessageComponent message={e.item} />
                         )}
                         keyExtractor={(item,index)=>{return  String(item._id)}}
-                    />
+                        />
                 ) : (
                     ""
-                )}
+                    )}
             </View>
 
             <View style={MessagingStyles.messaginginputContainer}>
@@ -122,13 +131,15 @@ const MessagingScreen = ({ route, navigation }:MessagingProps) => {
                 <Pressable
                     style={MessagingStyles.messagingbuttonContainer}
                     onPress={handleSendNewMessage}
-                >
+                    >
                     <View>
                         <Text style={{ color: "#f2f0f1", fontSize: 15 }}>Send</Text>
                     </View>
                 </Pressable>
             </View>
         </View>
+                </PaperProvider>
+            </View>
     );
 };
 

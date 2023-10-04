@@ -14,7 +14,7 @@ import { getError } from '../utils/ErrorClassifier';
 import PasswordTextField from '../components/PasswordTextField';
 import { BACKEND_BASE_URL } from '@env';
 import { saveToken } from '../utils/TokenHandler';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 
 type SignUpScreenProps=NativeStackScreenProps<RootStackParamList,"SignUp">;
 

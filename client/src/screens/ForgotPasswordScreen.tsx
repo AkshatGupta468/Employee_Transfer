@@ -4,7 +4,7 @@ import { Feather,Ionicons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 import { RootStackParamList } from '../interfaces/app_interfaces';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

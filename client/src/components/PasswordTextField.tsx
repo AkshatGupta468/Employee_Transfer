@@ -1,7 +1,7 @@
 import React,{useEffect, useState,useRef} from 'react';
 import { View,TextInput }  from 'react-native';
 import { Feather} from '@expo/vector-icons';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 
 interface props{
     setPassword:React.Dispatch<React.SetStateAction<string>>

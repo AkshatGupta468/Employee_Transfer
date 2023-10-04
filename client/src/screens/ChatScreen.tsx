@@ -1,26 +1,23 @@
 import React, { useEffect,useState } from "react";
 import { View, Text, Pressable, SafeAreaView, FlatList } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { StyleSheet } from "react-native";
 
 import ChatComponent from "../components/ChatComponent";
-import { Chat, ChatThumb } from "../interfaces/app_interfaces";
-import { MessagingStyles } from "../utils/styles";
-import socket, { NEW_CHAT } from "../utils/socket";
+import { ChatThumb } from "../interfaces/app_interfaces";
+import { AppStyles, MessagingStyles } from "../utils/styles";
 
 const ChatScreen = ({chatsList,onChatOpen,refreshChatList}:
     {chatsList:[ChatThumb]|undefined,
         onChatOpen:(chatThumb:ChatThumb)=>void,
         refreshChatList:()=>void}) => {
-            
     
     return (
-        <SafeAreaView style={MessagingStyles.chatscreen}>
+        <SafeAreaView style={AppStyles.container}>
             <View style={MessagingStyles.chattopContainer}>
-                <View style={MessagingStyles.chatheader}>
+                <View style={[MessagingStyles.chatheader,{justifyContent:'space-between'}]}>
                     <Text style={MessagingStyles.chatheading}> Chats</Text>
-                    <Pressable onPress={refreshChatList}>
-                        <MaterialCommunityIcons name='reload' size={24} color='green' />
+                    <Pressable onPress={refreshChatList} style={{paddingHorizontal:10}}>
+                        <MaterialCommunityIcons name='reload'  size={30} color='green'  />
                     </Pressable>
                 </View>
             </View>

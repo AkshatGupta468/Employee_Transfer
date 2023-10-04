@@ -13,7 +13,7 @@ import { getError } from '../utils/ErrorClassifier';
 import PasswordTextField from '../components/PasswordTextField';
 import { colors } from '../utils/colors';
 import { useTheme } from 'react-native-paper';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 
 
 type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;

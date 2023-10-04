@@ -14,8 +14,8 @@ export interface Message {
   content: String
   sender: id
   chatId: id
-  createdAt: String
-  updatedAt: String
+  createdAt: string
+  updatedAt: string
 }
 
 export type id = String

@@ -1,8 +1,8 @@
-import React,{ useState} from 'react'
+import React,{ useEffect, useState} from 'react'
 import { Feather } from '@expo/vector-icons';
 import { FlatList, SafeAreaView, View } from 'react-native';
 import ListItem from '../components/ListItem';
-import {  MultipleSelectList } from 'react-native-dropdown-select-list';
+import {  MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { removeToken } from '../utils/TokenHandler';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,7 +13,7 @@ import axios from 'axios';
 import { getError } from '../utils/ErrorClassifier';
 import { ActivityIndicator, Surface } from 'react-native-paper';
 import { BACKEND_BASE_URL } from '@env';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 
 const data = [
     {key:'1',value:'1'},
@@ -47,7 +47,6 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
         Toast.show({type:'error',text1:"Log In again to continue"})
         navigation.dispatch(StackActions.replace("SignIn"))
     }
-    // @refrese reset
     const onNewChatHandler= async (sendTo:User)=>{
         console.log("new-chat with")
         console.log(sendTo)
@@ -64,6 +63,9 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
             })
         }
     }
+    useEffect(()=>{
+        getUsers(selectedDestinationLocation)
+    },[])
     
     const getUsers=async(place:string[])=>{
             if(token===null){
@@ -81,8 +83,6 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
                     let usersData=response.data.data.users
                     setUserData(usersData)
                     setLoading(false)
-                    console.log(usersData)
-                    Toast.show({type:'success',text1:'Recieved Profiles Successfully',position:'bottom'})
                 }).catch((error)=>{
                     setLoading(false);
                     console.log(error)
@@ -99,7 +99,7 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
     }
     return(
         <SafeAreaView style={AppStyles.container}>
-            {loading?<ActivityIndicator animating={loading} hidesWhenStopped={true} color={'red'} size={'large'} style={AppStyles.loading}/>:<View/>}
+            {loading?<ActivityIndicator animating={loading} hidesWhenStopped={true} color={'green'} size={'large'} style={AppStyles.loading}/>:<View/>}
             <MultipleSelectList
             setSelected={setSelectedDestinationLocation}
             data={data}
@@ -107,7 +107,7 @@ export default function ChooseUserScreen({route,navigation}:TabsScreenProps){
             labelStyles={{fontSize:10}}
             badgeStyles={AppStyles.badgeStyles}
             boxStyles={AppStyles.searchBar}
-            dropdownStyles={{margin:10,zIndex:1,backgroundColor:'white',width:300,alignSelf:'center'}}
+            dropdownStyles={{marginVertical:10,zIndex:1,backgroundColor:'white',width:300,alignSelf:'center'}}
             inputStyles={{fontSize:18,textAlignVertical:'center'}}
             dropdownTextStyles={{fontSize:16}}
             placeholder={'Destination Location*'}

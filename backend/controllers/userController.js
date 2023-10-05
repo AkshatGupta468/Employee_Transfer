@@ -1,4 +1,5 @@
 const Users = require("../models/userModel")
+const Locations = require("../models/locationModel")
 const catchAsync = require("../utils/catchAsync")
 const AppError = require("./../utils/appError")
 const multer = require("multer")
@@ -119,3 +120,16 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     },
   })
 })
+
+exports.getAllLocations = catchAsync(async (req, res, next) => {
+  const locations = await Locations.find();
+   
+  res.status(200).json({
+    status: "success",
+    results: locations.length,
+    data: {
+      locations,
+    },
+  })
+})
+

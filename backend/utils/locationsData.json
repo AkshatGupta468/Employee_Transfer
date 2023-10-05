@@ -1,0 +1,139 @@
+[
+    {
+        "cityNumber": 1,
+        "cityName": "KORIYA"
+    },
+    {
+        "cityNumber": 2,
+        "cityName": "SURGUJA"
+    },
+    {
+        "cityNumber": 3,
+        "cityName": "JASHPUR"
+    },
+    {
+        "cityNumber": 4,
+        "cityName": "RAIGARH"
+    },
+    {
+        "cityNumber": 5,
+        "cityName": "KORBA"
+    },
+    {
+        "cityNumber": 6,
+        "cityName": "JANJGIR-CHAMPA"
+    },
+    {
+        "cityNumber": 7,
+        "cityName": "BILASPUR"
+    },
+    {
+        "cityNumber": 8,
+        "cityName": "KAWARDHA"
+    },
+    {
+        "cityNumber": 9,
+        "cityName": "RAJNANDGAON"
+    },
+    {
+        "cityNumber": 10,
+        "cityName": "DURG"
+    },
+    {
+        "cityNumber": 11,
+        "cityName": "RAIPUR"
+    },
+    {
+        "cityNumber": 12,
+        "cityName": "MAHASAMUND"
+    },
+    {
+        "cityNumber": 13,
+        "cityName": "DHAMTARI"
+    },
+    {
+        "cityNumber": 14,
+        "cityName": "kANKER"
+    },
+    {
+        "cityNumber": 15,
+        "cityName": "BASTAR"
+    },
+    {
+        "cityNumber": 16,
+        "cityName": "DANTEWADA"
+    },
+    {
+        "cityNumber": 17,
+        "cityName": "NARAYANPUR"
+    },
+    {
+        "cityNumber": 18,
+        "cityName": "BIJAPUR"
+    },
+    {
+        "cityNumber": 19,
+        "cityName": "BALODA BAZAR"
+    },
+    {
+        "cityNumber": 20,
+        "cityName": "GARIYABAND"
+    },
+    {
+        "cityNumber": 21,
+        "cityName": "MUNGELI"
+    },
+    {
+        "cityNumber": 22,
+        "cityName": "BALOD"
+    },
+    {
+        "cityNumber": 23,
+        "cityName": "BEMETARA"
+    },
+    {
+        "cityNumber": 24,
+        "cityName": "KONDAGAON"
+    },
+    {
+        "cityNumber": 25,
+        "cityName": "SUKMA"
+    },
+    {
+        "cityNumber": 26,
+        "cityName": "BALRAMPUR"
+    },
+    {
+        "cityNumber": 27,
+        "cityName": "SURAJPUR"
+    },
+    {
+        "cityNumber": 28,
+        "cityName": "GAURELA PENDRA MARWAHI"
+    },
+    {
+        "cityNumber": 29,
+        "cityName": "MOHLA-MANPUR-AMBAGARH-CHOWKI"
+    },
+    {
+        "cityNumber": 30,
+        "cityName": "KHAIRAGARH-CHHUIKHADAN-GANDAI"
+    },
+    {
+        "cityNumber": 31,
+        "cityName": "SARANGARH-BILAIGARH"
+    },
+    {
+        "cityNumber": 32,
+        "cityName": "MANENDRAGARH-CHIRMIRI-BHARATPUR"
+    },
+    {
+        "cityNumber": 33,
+        "cityName": "SAKTI"
+    },
+    {
+        "cityNumber": 66,
+        "cityName": "RAIPUR(INDRAWATI)"
+    }
+]
+  

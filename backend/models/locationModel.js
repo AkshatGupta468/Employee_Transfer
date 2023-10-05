@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const locationSchema = new mongoose.Schema({
-    ddoId: {
-        type: String,
-        required: [true, "DDO Id is Required!"],
+      cityNumber:{
+        type: Number,
+        required: [true,"City Number is Required"],
         unique: true
       },
       cityName:{
@@ -12,8 +12,6 @@ const locationSchema = new mongoose.Schema({
         unique  : true
       }
 });
-
-
 
 const locationModel = mongoose.model("location", locationSchema);
 module.exports = locationModel;

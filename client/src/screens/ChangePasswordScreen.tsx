@@ -13,6 +13,7 @@ import { BACKEND_BASE_URL } from '@env';
 import Toast from 'react-native-toast-message';
 import { getError } from '../utils/ErrorClassifier';
 import { AppStyles } from '../utils/AppStyles';
+import { forgotPassword, updatePassword } from '../api';
 
 type ChangePasswordScreenProps=NativeStackScreenProps<RootStackParamList,"ChangePassword">;
 
@@ -31,18 +32,13 @@ export default function ChangePasswordScreen({route,navigation}:ChangePasswordSc
     }
     const Change=async()=>{
         console.log('Change');
-        let token=await getToken();
-        axios.patch(`${BACKEND_BASE_URL}/updatePassword`,{
-            
-        },{headers:{Authorization:`Bearer ${token}`}})
-            .then(response=>{
-                console.log(response.data)
-                Toast.show({type:'success',text1:'Password Changed Successfully',position:'bottom'})
-            }).catch((error)=>{
-                let errorData=error.response.data;
-                let {name,message}=getError(errorData);
-                Toast.show({type:'error',text1:message});
-            })
+        let {error,message}=await updatePassword(oldPassword,newPassword);
+        if(error){
+            Toast.show({type:'error',text1:message,position:'bottom'});
+        }else{
+            Toast.show({type:'success',text1:message,position:'bottom'})
+        }
+        
     }
     return(
         <View style={AppStyles.container}>

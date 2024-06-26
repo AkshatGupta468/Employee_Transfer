@@ -15,6 +15,7 @@ import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-lis
 import { colors } from '../utils/colors';
 import { saveUserLocation, saveUserName, saveUserPreferredLocations } from '../utils/LocalStorageHandler';
 import { AppStyles } from '../utils/AppStyles';
+import { updateProfile } from '../api';
 
 interface EditableTextFieldParams{
     icon:string,
@@ -89,9 +90,13 @@ export default function EditableTextField(input:EditableTextFieldParams){
                 patchData={preferredLocations:newValueObj};
             }
             bottomDrawerRef.current?.close()
-            axios.patch(`${BACKEND_BASE_URL}/profile`,patchData,{headers:{Authorization:`Bearer ${token}`}})
-            .then(async response=>{
-                console.log(response.data)
+            let {error,message}=await updateProfile(patchData);
+            if(error){
+                Toast.show({type:'error',text1:message});
+                goToSignInPage({route,navigation})
+            }else{
+                Toast.show({type:'success',text1:'Saved Profile Successfully',position:'bottom'})
+                input.setLoading(false)
                 if(input.fieldName==='Name'){
                     input.setName(newValue)
                     await saveUserName(newValue)
@@ -103,14 +108,7 @@ export default function EditableTextField(input:EditableTextFieldParams){
                     await saveUserPreferredLocations(newValueObj)
                     setValueObj([])
                 }
-                Toast.show({type:'success',text1:'Saved Profile Successfully',position:'bottom'})
-                input.setLoading(false)
-            }).catch((error)=>{
-                let errorData=error.response.data;
-                let {name,message}=getError(errorData);
-                Toast.show({type:'error',text1:message});
-                goToSignInPage({route,navigation})
-            })
+            }
         }
     }
     return(

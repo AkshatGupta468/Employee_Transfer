@@ -29,6 +29,7 @@ const filterObj = (obj, ...allowedFields) => {
 }
 
 exports.userInformationValidator = catchAsync(async (req, res, next) => {
+  console.log(req.user)
   if ((!req.user.name)  || (!req.user.location)  || (!req.user.preferredLocations)){
     return next(
       new AppError(400, {

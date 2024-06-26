@@ -13,13 +13,14 @@ import { RootStackParamList } from '../utils/AppNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfilePictureScreen from '../screens/ProfilePictureScreen';
 import { getUserData, saveUserPhoto } from '../utils/LocalStorageHandler';
+import { updatePhoto } from '../api';
 
 export default function UploadImageField() {
     const [image, setImage] = useState('');
     useEffect(()=>{
         getUserData().then(response=>{
             if(response!==undefined&&response.hasOwnProperty("photo")){
-                console.log(response)
+                // console.log(response)
                 setImage(response?.photo)
             }
         })
@@ -39,15 +40,13 @@ export default function UploadImageField() {
                 //TODO                
             }else{
                 base64 = await FileSystem.readAsStringAsync(_image.assets[0].uri, { encoding: 'base64' });
-                console.log(_image.assets[0].uri)
                 await saveUserPhoto(base64)
-                axios.patch(`${BACKEND_BASE_URL}/profile`,{photo:base64},{headers:{Authorization:`Bearer ${token}`}}).
-                then(async response=>{
-                    Toast.show({type:'success',text1:'Image uploaded successfully',position:'bottom'})                
-                })
-                .catch(error=>{
-                    Toast.show({type:'error',text1:"Couldn't upload",position:'bottom'})
-                })
+                let {error,message}=await updatePhoto(base64);
+                if(error){
+                    Toast.show({type:'error',text1:message,position:'bottom'})
+                }else{
+                    Toast.show({type:'success',text1:message,position:'bottom'})
+                }
                 setImage(base64);
             }
         }

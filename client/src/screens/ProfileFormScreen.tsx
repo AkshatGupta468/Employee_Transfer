@@ -19,6 +19,7 @@ import { AntDesign,Ionicons,MaterialCommunityIcons } from '@expo/vector-icons';
 import UploadImageField from '../components/UploadImageField';
 import { colors } from '../utils/colors';
 import { AppStyles } from '../utils/styles';
+import { saveProfileAPI } from '../api';
 
 const data = [
     {key:'1',value:'1'},
@@ -53,33 +54,16 @@ export default function ProfileFormScreen({route,navigation}:ScreenProps){
           );
     }
     const saveProfile=async()=>{
-        console.log(`Token : ${token}`)
-        await axios.patch(`${BACKEND_BASE_URL}/profile`,{
-            name: name,
-            location: selectedCurrentLocation,
-            preferredLocations:selectedPreferredLocations,
-        },{headers:{Authorization:`Bearer ${token}`}})
-        .then(response=>{
-            console.log(response.data);
-            console.log('sent data');
-            const myuser:User={
-                _id:response.data.data.user._id,
-                name:response.data.data.user.name,
-                email:response.data.data.user.email,
-                location:response.data.data.user.location,
-                preferredLocations:response.data.data.user.preferredLocations,
-                photo:response.data.data.user.hasOwnProperty("photo")?response.data.data.user.photo:''
-            }
-            currentUser=myuser
-            Toast.show({type:'success',text1:'Profile created successfully'})
-            popScreen('WithinAppNavigator');
-            navigation.navigate('WithinAppNavigator');
-        }).catch((error)=>{
-            let errorData=error.response.data.errors;
-            let {name,message}=getError(errorData)
+        let {error,message}=await saveProfileAPI(name,selectedCurrentLocation,selectedPreferredLocations)
+        if(error){
             Toast.show({type:'error',text1:message,position:'bottom'})
-            console.log(message)
-        })       
+            return;
+        }else{
+            Toast.show({type:'success',text1:'Profile created successfully!!',position:'bottom'})
+        }
+        popScreen('WithinAppNavigator');
+        navigation.navigate('WithinAppNavigator');
+             
     }
 
     return(

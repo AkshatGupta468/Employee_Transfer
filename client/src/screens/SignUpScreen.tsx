@@ -15,6 +15,7 @@ import PasswordTextField from '../components/PasswordTextField';
 import { BACKEND_BASE_URL } from '@env';
 import { saveToken } from '../utils/TokenHandler';
 import { AppStyles } from '../utils/styles';
+import { createId } from '../api';
 
 type SignUpScreenProps=NativeStackScreenProps<RootStackParamList,"SignUp">;
 
@@ -76,28 +77,19 @@ export default function SignUpScreen({route,navigation}:SignUpScreenProps) {
         console.log('Forgot Password');
         navigation.navigate("ForgotPassword");
     }
-    // @refresh reset
-    const SignUp=()=>{
+    //TEST the following code :
+    //=================================================================================
+    const SignUp=async()=>{
         console.log('Sign Up');
-        axios.post(`${BACKEND_BASE_URL}/signup`,{
-            email: email,
-            password: password,
-            passwordConfirm:confirmPassword
-        })
-        .then(response=>{
-            console.log(response.data);
-            saveToken(response.data.token)
-            popScreen('ProfileFormScreen');
-            navigation.navigate('ProfileFormScreen');
-        }).catch((error)=>{
-            console.log(error)
-            let errorData=error.response.data.errors;
-            let {name,message}=getError(errorData)
+        let {error,message} = await createId(email,password,confirmPassword)
+        if(error){
             Toast.show({type:'error',text1:message,position:'bottom'})
-            console.log(message)
-        })
+            return;
+        }
+        popScreen('ProfileFormScreen');
+        navigation.navigate('ProfileFormScreen');
     }
-    
+    //=================================================================================
     return(
         <View style={AppStyles.container}>
             <View style={[AppStyles.topMostItem,AppStyles.roundIcon]}>

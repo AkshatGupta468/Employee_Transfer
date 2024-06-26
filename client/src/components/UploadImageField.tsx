@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, View, StyleSheet, TouchableHighlight } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { FAB } from 'react-native-paper';
@@ -7,8 +7,15 @@ import * as FileSystem from 'expo-file-system';
 import { BACKEND_BASE_URL } from '@env';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { updatePhoto } from '../api';
 
 export default function UploadImageField() {
+    const [image, setImage] = useState('');
+    useEffect(()=>{
+            if(currentUser!==undefined&& currentUser!=null &&currentUser.photo){
+                setImage(currentUser.photo)
+            }
+    },[image])
     let base64:string;
     const addImage = async () => {
         let _image = await ImagePicker.launchImageLibraryAsync({
@@ -23,15 +30,13 @@ export default function UploadImageField() {
                 //TODO                
             }else{
                 base64 = await FileSystem.readAsStringAsync(_image.assets[0].uri, { encoding: 'base64' });
-                if(base64 && currentUser)
-                    currentUser.photo=base64
-                axios.patch(`${BACKEND_BASE_URL}/profile`,{photo:base64},{headers:{Authorization:`Bearer ${token}`}}).
-                then(async response=>{
-                    Toast.show({type:'success',text1:'Image uploaded successfully',position:'bottom'})                
-                })
-                .catch(error=>{
-                    Toast.show({type:'error',text1:"Couldn't upload",position:'bottom'})
-                })
+                let {error,message}=await updatePhoto(base64);
+                if(error){
+                    Toast.show({type:'error',text1:message,position:'bottom'})
+                }else{
+                    Toast.show({type:'success',text1:message,position:'bottom'})
+                }
+                setImage(base64);
             }
         }
       };

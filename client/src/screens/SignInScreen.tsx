@@ -14,6 +14,7 @@ import PasswordTextField from '../components/PasswordTextField';
 import { colors } from '../utils/colors';
 import { useTheme } from 'react-native-paper';
 import { AppStyles } from '../utils/styles';
+import { signIn } from '../api';
 
 
 type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;
@@ -52,38 +53,19 @@ export default function SignInScreen({navigation}:SignInProps) {
     }
 
     const SignIn=async()=>{
-        axios.post(`${BACKEND_BASE_URL}/login`,{email,password})
-        .then(async response=>{
+        let {error,message}=await signIn(email,password);
+        if(error){
+            Toast.show({type:'error',text1:message,position:'bottom'})
+        }else{
             Toast.show({type:'success',text1:'Logged In Successfully',position:'bottom'})
-            token=response.data.token
-            saveToken(response.data.token)
-            if(!(response.data.data.user.hasOwnProperty("name"))||!(response.data.data.user.hasOwnProperty("location"))||!(response.data.data.user.hasOwnProperty("preferredLocations"))){
-                console.log("GO to profile form screen")
+            if(message==='1'){
                 popScreen('ProfileFormScreen');
                 navigation.navigate('ProfileFormScreen')
-            }else{
-                const myuser:User={
-                    _id:response.data.data.user._id,
-                    name:response.data.data.user.name,
-                    email:response.data.data.user.email,
-                    location:response.data.data.user.location,
-                    preferredLocations:response.data.data.user.preferredLocations,
-                    photo:response.data.data.user.hasOwnProperty("photo")?response.data.data.user.photo:''
-                }
-                currentUser=myuser
-                console.log("go within app")
+            }else if(message==='2'){
                 popScreen('WithinAppNavigator');
                 navigation.navigate('WithinAppNavigator')
             }
-        }).catch((error)=>{
-            console.log(error)
-            // @refresh  reset
-
-            if(getError(error.response.data.errors).name==='INVALID_EMAIL_PASSWORD'){
-                Toast.show({type:'error',text1:getError(error.response.data.errors).message,position:'bottom'})
-            }
-            //TODO When no such user is registered
-        })
+        }
     }
     const forgotPassword=()=>{
         console.log('Forgot Password');

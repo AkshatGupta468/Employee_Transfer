@@ -9,7 +9,7 @@ import { RootStackParamList } from '../interfaces/app_interfaces';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../utils/colors';
-import { BACKEND_BASE_URL } from '@env';
+import { forgotPassword } from '../api';
 
 
 type ScreenProps=NativeStackScreenProps<RootStackParamList,"ForgotPassword">;
@@ -17,24 +17,18 @@ type ScreenProps=NativeStackScreenProps<RootStackParamList,"ForgotPassword">;
 export default function ForgotPasswordScreen({navigation,route}:ScreenProps){
     console.log("I'm in Forgot Password");
     const [email,setEmail]=useState('');
-
-    const sendMail=(email:String)=>{
-        axios.post(`${BACKEND_BASE_URL}/forgotPassword`,{email})
-            .then(response=>{
-                console.log(response.data);
-            }).catch((error)=>{
-                let message:string
-                let errorData=error.response.data.errors;
-                if(errorData.hasOwnProperty("email")){
-                    message=errorData.email.message
-                }else{
-                    message='Unknown Error'
-                }
-                Toast.show({type:'error',text1:message,position:'bottom'})
-                console.log(message)
-            })
+    //TEST the following code:
+    
+    //=================================================================================
+    const sendMail=async(email:string)=>{
+        let {error,message}=await forgotPassword(email)
+        if(error){
+            Toast.show({type:'error',text1:message,position:'bottom'})
+            return;
+        }
         console.log("Sending Mail to user...")
     };
+    //=================================================================================
 
     return(
             <View style={AppStyles.container}>

@@ -8,7 +8,7 @@ A Full Stack Web application made using MVC architecture with Authentication & A
 - 1000s of Employees keep sending about their availability on WhatsApp and Telegram groups with 40,000+ peoples.
 
 ## Solution
-This Application enables Employees on different locations to find another employee who have a mutual intrest in exchanging the job locations hence getting a mutual transfer.
+This Application enables Employees on different locations to find another employee who have a mutual interest in exchanging the job locations hence getting a mutual transfer.
 
 ## Tech Stack
 Client application made in React-Native. 

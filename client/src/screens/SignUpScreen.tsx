@@ -4,7 +4,8 @@ import {TextInput} from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import PhoneInput from "react-native-phone-input";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import { StackActions } from '@react-navigation/native';
 import axios from 'axios';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';

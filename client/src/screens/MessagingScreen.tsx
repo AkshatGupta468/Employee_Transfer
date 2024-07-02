@@ -1,123 +1,145 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { View, TextInput, Text, FlatList, Pressable } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { Chat, RootStackParamList, id } from '../interfaces/app_interfaces';
+import { Ionicons } from "@expo/vector-icons";
+
 import MessageComponent from "../components/MessageComponent";
 import { MessagingStyles } from "../utils/styles";
-import {Message, User,Chat} from "../interfaces/app_interfaces"
-type MessagingProps=NativeStackScreenProps<RootStackParamList,"Messaging">;
+import {Message} from "../interfaces/app_interfaces"
+import api from '../utils/api'
+import socket, { NEW_CHAT, NEW_MESSAGE } from "../utils/socket";
+import { AppStyles } from "../utils/styles";
+import { PaperProvider } from "react-native-paper";
+
+type MessagingProps=NativeStackScreenProps<RootStackParamList,"MessagingScreen">;
 
 const MessagingScreen = ({ route, navigation }:MessagingProps) => {
-    const [chatMessages, setChatMessages] = useState<Message[]>([
-        {
-            id: "1",
-            content: "Hello guys, welcome!",
-            timestamp: "07:50",
-            sender: "Tomer",
-            chatId:"asdf"
-        },
-        {
-            id: "2",
-            content: "Hi Tomer, thank you! 😇",
-            timestamp: "08:50",
-            sender: "David",
-            chatId:"asdf",
-        },
-    ]);
+    let {chatThumb}=route.params;
+    const [chat,setChat]=useState<Chat>()
+    useEffect(()=>{
+        if(chatThumb._id){
+            api.getChat(chatThumb._id).then((chat:Chat)=>{
+                setChat(chat)
+                
+            }).catch((err)=>{
+
+            })
+        } else {
+            api.getChatSendTo(chatThumb.participants[0]).then((chat:Chat)=>{
+                setChat(chat)
+                chatThumb=chat
+            }).catch((err)=>{
+
+            })
+        }
+    },[])
+
+    useEffect(()=>{
+        console.log("adding newmessage listenerr")
+        socket.on(NEW_MESSAGE,({newMessageId,chatId})=>{
+            console.log(`received messageId:${newMessageId} chatId:${chatId} and my ChatId is ${chat?._id} I am ${currentUser?.name}`)
+            api.getMessage(newMessageId,chatId).then((message:Message)=>{
+                appendNewMessage(message)
+            })
+        })
+
+        return ()=>{
+            console.log("turning of new_message listenrer")
+            socket.off(NEW_MESSAGE)
+        }
+    },[])
+
+    const appendNewMessage=(message:Message)=>{
+        setChat((chat)=>{
+            chat?.messages?.push(message)
+            return chat;
+        })
+    }
 
     const [sendText, setSendText] = useState("");
-    const [user, setUser] = useState<User>({
-        id:"1",
-        name:"Tomer",
-        location:"Banglore",
-        role:"user",
-        email:"tomer@gmail.com",
-    });
 
-    //👇🏻 Access the chatroom's name and id
-
-//👇🏻 This function gets the username saved on AsyncStorage
-    const getUsername = async () => {
-        try {
-            // const value = await AsyncStorage.getItem("username");
-            // if (value !== null) {
-            //     setUser(value);
-            // }
-        } catch (e) {
-            console.error("Error while loading username!");
+    const handleSendNewMessage = async () => {      
+        let data:{newMessageId:id,chatId:id};
+        if(chat?._id){
+            data = await api.sendMessage({
+                chatId:chat._id,
+                content:sendText
+            })
+            const {newMessageId,chatId}=data;
+            api.getMessage(newMessageId,chatId).then((message:Message)=>{
+                appendNewMessage(message)
+                setSendText("")
+            })
         }
+        else{
+            data = await api.sendMessage({
+                sendTo:chatThumb.participants[0],
+                content:sendText
+            })
+            setSendText("")
+            api.getChat(data.chatId).then((chat:Chat)=>{
+                setChat(chat)
+            }).catch((err)=>{
+
+            })
+            socket.emit(NEW_CHAT,{userId:chatThumb.participants[0]})
+        }
+
     };
 
-    //👇🏻 Sets the header title to the name chatroom's name
-    useLayoutEffect(() => {
-        // navigation.setOptions({ title: name });
-        // getUsername()
-    }, []);
-
-    const handleNewMessage = () => {
-        console.log({
-            sendText,
-            user,
-        });
-        
-        setChatMessages((chatMessages)=>{
-            const {chat,sendTo}=route.params;
-            
-            const newMessage:Message={
-                id:"4",
-                content:sendText,
-                sender: user.name as String,
-                chatId:chat.id,
-                timestamp:new Date().getHours().toString(),
-            }
-            chatMessages.push(newMessage);
-            return chatMessages;
-        })
-        setSendText("");
-    };
-
+    
     return (
+        <View style={AppStyles.container}>
+            <PaperProvider>
         <View style={MessagingStyles.messagingscreen}>
             <View style={MessagingStyles.chattopContainer}>
                 <View style={MessagingStyles.chatheader}>
-                    <Text style={MessagingStyles.chatheading}> {route.params.chat.title} </Text>
+                    <Ionicons
+                        name='person-circle-outline'
+                        size={45}
+                        color='black'
+                    /> 
+                    <Text style={MessagingStyles.chatheading}> {chatThumb?.title} </Text>
                 </View>
             </View>
             <View
                 style={[
-                    MessagingStyles.messagingscreen,
-                    { paddingVertical: 15, paddingHorizontal: 10 },
+                    MessagingStyles.messagingscreen
                 ]}
-            >
-                {chatMessages[0] ? (
+                >
+                { (chat?.messages?.[0]) ? (
                     <FlatList
-                        data={chatMessages}
+                        data={chat?.messages}
                         renderItem={(e) => (
-                            <MessageComponent message={e.item} user={user} />
+                            <MessageComponent message={e.item} />
                         )}
-                        keyExtractor={(item,index)=>{return  String(item.chatId)}}
-                    />
+                        keyExtractor={(item,index)=>{return  String(item._id)}}
+                        />
                 ) : (
                     ""
-                )}
+                    )}
             </View>
 
             <View style={MessagingStyles.messaginginputContainer}>
                 <TextInput
                     style={MessagingStyles.messaginginput}
                     onChangeText={(value) => setSendText(value)}
+                    value={sendText}
                 />
                 <Pressable
                     style={MessagingStyles.messagingbuttonContainer}
-                    onPress={handleNewMessage}
-                >
+                    onPress={handleSendNewMessage}
+                    >
                     <View>
-                        <Text style={{ color: "#f2f0f1", fontSize: 15 }}>SEND</Text>
+                        <Text style={{ color: "#f2f0f1", fontSize: 15 }}>Send</Text>
                     </View>
                 </Pressable>
             </View>
         </View>
+                </PaperProvider>
+            </View>
     );
 };
 

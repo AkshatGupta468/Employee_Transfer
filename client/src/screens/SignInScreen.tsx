@@ -2,7 +2,8 @@ import React,{ProfilerProps, useEffect, useState} from 'react';
 import { Text,View,StyleSheet,StatusBar,TextInput, Button, Pressable} from 'react-native';
 import { Feather} from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import { StackActions } from '@react-navigation/native';
 import axios from 'axios';
 import {BACKEND_BASE_URL} from "@env";
@@ -20,11 +21,12 @@ import { signIn } from '../api';
 
 type SignInProps=NativeStackScreenProps<RootStackParamList,"SignIn">;
 
-export default function SignInScreen({route,navigation}:SignInProps) {
+export default function SignInScreen({navigation}:SignInProps) {
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
+
     const checkToken=async()=>{
-        let token=await getToken()
+        await getToken()
         if(token!==null){
             await axios.get(`${BACKEND_BASE_URL}/profile`,{headers:{Authorization:`Bearer ${token}`}})
             .then(response=>{
@@ -32,9 +34,10 @@ export default function SignInScreen({route,navigation}:SignInProps) {
                     popScreen('ProfileFormScreen');
                     navigation.navigate('ProfileFormScreen')
                 }else{
+                    currentUser=response.data.data.user
                     popScreen('WithinAppNavigator');
                     navigation.navigate('WithinAppNavigator')
-                }                 
+                }
             }).catch(error=>{
                 console.log(error.response.data)
                 Toast.show({type:'error',text1:error})                                
@@ -50,6 +53,7 @@ export default function SignInScreen({route,navigation}:SignInProps) {
             StackActions.replace(screenName)
           );
     }
+
     const SignIn=async()=>{
         let {error,message}=await signIn(email,password);
         if(error){

@@ -1,28 +1,36 @@
+export type RootStackParamList = {
+  MessagingScreen: { chatThumb: ChatThumb }
+  SignIn: undefined
+  SignUp: undefined
+  ForgotPassword: undefined
+  WithinAppNavigator: undefined
+  ChangePassword: undefined
+  ProfileFormScreen: undefined
+  ProfilePictureScreen: undefined
+}
+
 export interface Message {
-  id: String
+  _id: id
   content: String
-  sender: String
-  chatId: String
-  timestamp: String
+  sender: id
+  chatId: id
+  createdAt: string
+  updatedAt: string
 }
 
-export interface User {
-  id: string
-  __v?: number
-  email: string
-  location?: string
-  name?: string
-  phone_number?: string
-  photo?: string
-  role?: string
-  passwordResetExpires?: string
-  passwordResetToken?: string
-}
-
+export type id = String
 export interface Chat {
-  id: String
-  title: String | undefined
-  messages: [Message]
-  participants: [User]
-  createdBy: [User]
+  _id?: id
+  title: String
+  messages?: [Message]
+  participants: [id]
+  createdBy: id
+}
+
+export interface ChatThumb {
+  _id?: id
+  title: String
+  lastMessage?: Message
+  participants: [id]
+  createdBy: id
 }

@@ -3,70 +3,72 @@ const validator = require("validator")
 const bcrypt = require("bcryptjs")
 const crypto = require("crypto")
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-   },
-  email: {
-    type: String,
-    required: [true, "Email is Required!"],
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, "Invalid Email!"],
-  },
-  role: {
-    type: String,
-    enum: ["user", "admin"],
-    default: "user",
-  },
-  password: {
-    type: String,
-    required: [true, "Password is Required!"],
-    minlength: [8, "Password too Short! Use 8 Characters Atleast"],
-    select: false,
-  },
-  passwordConfirm: {
-    type: String,
-    required: [true, "Please confirm your password"],
-    validate: {
-      validator: function (el) {
-        return el === this.password
-      },
-      message: "Passwords are not the same!",
+const UserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
     },
-  },
-  photo: {
-    type: String,
-    default: "default.jpg",
-  },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
+    email: {
+      type: String,
+      required: [true, "Email is Required!"],
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, "Invalid Email!"],
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    password: {
+      type: String,
+      required: [true, "Password is Required!"],
+      minlength: [8, "Password too Short! Use 8 Characters Atleast"],
+      select: false,
+    },
+    passwordConfirm: {
+      type: String,
+      required: [true, "Please confirm your password"],
+      validate: {
+        validator: function (el) {
+          return el === this.password
+        },
+        message: "Passwords are not the same!",
+      },
+    },
+    photo: {
+      type: String,
+      default: "default.jpg",
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
 
-  location: {
-    type: String
-  },
-  preferredLocations:{
-    type: [String]
-  },
-  deactivated:{
-    type: Boolean,
-    default: false
-  }
-  /*
+    location: {
+      type: String,
+    },
+    preferredLocations: {
+      type: [String],
+    },
+    deactivated: {
+      type: Boolean,
+      default: false,
+    },
+    /*
     image: {
       type: mongoose.Schema.Types.ObjectId,
       default: new mongoose.Types.ObjectId("62d330992807e471b7032b30"),
     },
   }
     */
-  // {
-  //   timestamps: true,
-  // }
-})
+  },
+  {
+    timestamps: true,
+  }
+)
 
 //to encrypt the password if a new password has been created or password is modified
-userSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next()
 
   //hashing using bcrypt
@@ -77,7 +79,7 @@ userSchema.pre("save", async function (next) {
 })
 
 //to update the passwordChangedAt property if the password has been modified
-userSchema.pre("save", function (next) {
+UserSchema.pre("save", function (next) {
   if (!this.isModified("password") || this.isNew) return next()
   //subtracting 1sec because sometimes saving in a database is slower than creating a token. If token is created before, user will not be able to login using the new token
   this.passwordChangedAt = Date.now() - 1000
@@ -85,14 +87,14 @@ userSchema.pre("save", function (next) {
 })
 //Instance Methods: available on all documents of a collection
 
-userSchema.methods.correctPassword = async function (
+UserSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword)
 }
 
-userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+UserSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,
@@ -103,7 +105,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   return false
 }
 
-userSchema.methods.createPasswordResetToken = function () {
+UserSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex")
 
   this.passwordResetToken = crypto
@@ -117,5 +119,5 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken
 }
 
-const UserModel = mongoose.model("User", userSchema)
-module.exports = UserModel
+const UserModel = mongoose.model("User", UserSchema)
+module.exports = { UserModel, UserSchema }

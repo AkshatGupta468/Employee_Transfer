@@ -1,47 +1,33 @@
 import { View, Text, Pressable } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import { MessagingStyles } from "../utils/styles";
-import { Chat,Message } from "../interfaces/app_interfaces";
+import { ChatThumb } from "../interfaces/app_interfaces";
+import { showTime } from "../utils/datetimeformat";
 
+const messageLim=40;
 
-const ChatComponent = ({ chat }:{chat:Chat}) => {
-    const navigation = useNavigation();
-    const [lastMessage, setLastMessage] = useState<Message>();
-
-    //👇🏻 Retrieves the last message in the array from the item prop
-    useLayoutEffect(() => {
-        setLastMessage(chat.messages[chat.messages.length - 1]);
-    }, []);
-
-    ///👇🏻 Navigates to the Messaging screen
-    const handleNavigation = () => {
-        navigation.navigate("Messaging", {
-            chat:chat,
-        });
-    };
-
+const ChatComponent = ({ chatThumb,onChatOpen }:{chatThumb:ChatThumb,onChatOpen:(chatThumb:ChatThumb)=>void}) => {
     return (
-        <Pressable style={MessagingStyles.cchat} onPress={handleNavigation}>
-            <Ionicons
+        <Pressable style={MessagingStyles.cchat} onPress={()=>{onChatOpen(chatThumb)}}>
+                <Ionicons
                 name='person-circle-outline'
                 size={45}
                 color='black'
                 style={MessagingStyles.cavatar}
-            />
+            /> 
 
             <View style={MessagingStyles.crightContainer}>
                 <View>
-                    <Text style={MessagingStyles.cusername}>{lastMessage?.sender}</Text>
+                    <Text style={MessagingStyles.cusername}>{chatThumb.title}</Text>
 
                     <Text style={MessagingStyles.cmessage}>
-                        {lastMessage?.content ? lastMessage.content : "Tap to start chatting"}
+                        {(chatThumb?.lastMessage?.content)?(chatThumb.lastMessage?.content.length>messageLim?chatThumb.lastMessage?.content.slice(0,messageLim).trim()+"...":chatThumb.lastMessage?.content):"Tap to Start Chatting"}
                     </Text>
                 </View>
                 <View>
                     <Text style={MessagingStyles.ctime}>
-                        {lastMessage?.timestamp ? lastMessage.timestamp : "now"}
+                        {chatThumb.lastMessage?.createdAt ? showTime(chatThumb.lastMessage?.createdAt):""}
                     </Text>
                 </View>
             </View>

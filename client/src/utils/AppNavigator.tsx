@@ -8,23 +8,13 @@ import ProfileFormScreen from '../screens/ProfileFormScreen';
 import MessagingScreen from '../screens/MessagingScreen';
 import { Chat } from '../interfaces/app_interfaces';
 import ProfilePictureScreen from '../screens/ProfilePictureScreen';
-
-export type RootStackParamList={
-    "MessagingScreen":{chat:Chat};
-    "SignIn":undefined;
-    "SignUp":undefined;
-    "ForgotPassword":undefined;
-    "WithinAppNavigator":undefined;
-    "ChangePassword":undefined;
-    "ProfileFormScreen":undefined;
-    "ProfilePictureScreen":undefined
-}
+import { RootStackParamList } from '../interfaces/app_interfaces';
 
 const {Navigator,Screen,Group}=createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator=()=>{
     return(
-        <Navigator screenOptions={{headerShown:false}}>
+        <Navigator screenOptions={{headerShown:false}} initialRouteName='SignIn'>
             <Group>
                 <Screen name="SignIn" component={SignInScreen}/>
                 <Screen name="SignUp" component={SignUpScreen}/>

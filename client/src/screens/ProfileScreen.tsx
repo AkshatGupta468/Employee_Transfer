@@ -3,7 +3,7 @@ import { Text,View,StatusBar,TextInput, Pressable,Dimensions, ScrollView, Alert,
 import { Feather} from '@expo/vector-icons';
 import {  SelectList } from 'react-native-dropdown-select-list';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
 import { getToken,saveToken,removeToken } from '../utils/TokenHandler';
 import { BACKEND_BASE_URL } from '@env';
 import axios from 'axios';
@@ -16,28 +16,27 @@ import EditableTextField from '../components/EditableTextField';
 import { AntDesign,Ionicons,MaterialCommunityIcons } from '@expo/vector-icons'; 
 import UploadImageField from '../components/UploadImageField';
 import ChangePasswordScreen from './ChangePasswordScreen';
-import { getUserData } from '../utils/LocalStorageHandler';
-import { AppStyles } from '../utils/AppStyles';
+import { AppStyles } from '../utils/styles';
 
 const helpName=`This is not your username or pin.This name will be visible to other users`;
 
 const data = [
-    {key:'1',value:'Jammu & Kashmir'},
-    {key:'2',value:'Gujrat'},
-    {key:'3',value:'Maharashtra'},
-    {key:'4',value:'Goa'},
-    {key:'5',value:'X'},
-    {key:'6',value:'Y'},
-    {key:'7',value:'Z'},
-    {key:'8',value:'W'},
-    {key:'9',value:'A'},
-    {key:'10',value:'B'},
-    {key:'11',value:'C'},
-    {key:'12',value:'D'},
-    {key:'13',value:'E'},
-    {key:'14',value:'F'},
-    {key:'15',value:'G'},
-    {key:'16',value:'H'},
+    {key:'1',value:'1'},
+    {key:'2',value:'2'},
+    {key:'3',value:'3'},
+    {key:'4',value:'4'},
+    {key:'5',value:'5'},
+    {key:'6',value:'6'},
+    {key:'7',value:'7'},
+    {key:'8',value:'8'},
+    {key:'9',value:'9'},
+    {key:'10',value:'10'},
+    {key:'11',value:'11'},
+    {key:'12',value:'12'},
+    {key:'13',value:'13'},
+    {key:'14',value:'14'},
+    {key:'15',value:'15'},
+    {key:'16',value:'16'},
   ];
 
 interface ProfileDataStructure{
@@ -55,11 +54,6 @@ interface profileStates{
 
 type TabsScreenProps=NativeStackScreenProps<RootStackParamList,"WithinAppNavigator">;
 
-const goToSignInPage=({route,navigation}:TabsScreenProps)=>{
-    Toast.show({type:'error',text1:"Log In again to continue"})
-    navigation.dispatch(StackActions.replace("SignIn"))
-    navigation.navigate("SignIn");
-}
 
 export default function ProfileScreen({route,navigation}:TabsScreenProps){
     const [name,setName]=useState<string>('');
@@ -73,30 +67,30 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
         setPreferredLocations:setPreferredLocations,
         setLoading:setLoading
     }
+    const goToSignInPage=()=>{
+        Toast.show({type:'error',text1:"Log In again to continue"})
+        navigation.dispatch(StackActions.replace("SignIn"))
+        navigation.navigate("SignIn");
+    }
+    
     useEffect(()=>{
         getProfile()
-    },[])
+    },[currentUser])
     const getProfile=async()=>{
-        const token=await getToken();
         if(token===null){
             console.log("empty token")
-            goToSignInPage({route,navigation})
+            goToSignInPage()
         }
-        setLoading(true)
-        await getUserData().then(
-            response=>{
-            let userData=response
-            if(userData!==undefined){
-                setName(userData.name)
-                setLocation(userData.location)
-                setEmail(userData.email)
-                setPreferredLocations(userData.preferredLocations)
-                setLoading(false)
-                Toast.show({type:'success',text1:'Recieved Profile Successfully',position:'bottom'})
-            }
-            }).catch(error=>{
-            Toast.show({type:'error',text1:"Couldn't retrieve profile"});
-        })
+        if(currentUser && currentUser.name){
+            setName(currentUser.name)
+        }
+        if(currentUser && currentUser.location){
+            setLocation(currentUser.location)
+        }if(currentUser && currentUser.email){
+            setEmail(currentUser.email)
+        }if(currentUser && currentUser.preferredLocations){
+            setPreferredLocations(currentUser.preferredLocations)
+        }
     }
     const [visible, setVisible] = React.useState(false);
 
@@ -114,20 +108,19 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
               style: 'cancel',
             },
             {text: 'OK', onPress: async () => {
-            const token=await getToken();
             if(token===null){
                 console.log("empty token")
-                goToSignInPage({route,navigation})
+                goToSignInPage()
             }
             await axios.patch(`${BACKEND_BASE_URL}/profile`,{deactivated:true},{headers:{Authorization:`Bearer ${token}`}}).
             then(response=>{
                 console.log(response.data)
                 removeToken();
-                goToSignInPage({route,navigation})
+                goToSignInPage()
             }).catch(error=>{
             if(getError(error.response.data).name==='USER_DELETED'){
                 removeToken()
-                goToSignInPage({route,navigation})
+                goToSignInPage()
             }
             Toast.show({type:'error',text1:"Couldn't retrieve profile"});
         })
@@ -145,7 +138,8 @@ export default function ProfileScreen({route,navigation}:TabsScreenProps){
             },
             {text: 'OK', onPress: () => {
                 removeToken();
-                goToSignInPage({route,navigation})
+                currentUser=null
+                goToSignInPage()
             }},
           ]);
     }

@@ -4,7 +4,8 @@ import {TextInput} from 'react-native-paper'
 import { Feather} from '@expo/vector-icons';
 import {  MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import { getToken,saveToken,removeToken } from '../utils/TokenHandler';
 import { BACKEND_BASE_URL } from '@env';
 import axios from 'axios';
@@ -23,22 +24,22 @@ import { AppStyles } from '../utils/AppStyles';
 import { saveProfileAPI } from '../api';
 
 const data = [
-    {key:'1',value:'Jammu & Kashmir'},
-    {key:'2',value:'Gujrat'},
-    {key:'3',value:'Maharashtra'},
-    {key:'4',value:'Goa'},
-    {key:'5',value:'X'},
-    {key:'6',value:'Y'},
-    {key:'7',value:'Z'},
-    {key:'8',value:'W'},
-    {key:'9',value:'A'},
-    {key:'10',value:'B'},
-    {key:'11',value:'C'},
-    {key:'12',value:'D'},
-    {key:'13',value:'E'},
-    {key:'14',value:'F'},
-    {key:'15',value:'G'},
-    {key:'16',value:'H'},
+    {key:'1',value:'1'},
+    {key:'2',value:'2'},
+    {key:'3',value:'3'},
+    {key:'4',value:'4'},
+    {key:'5',value:'5'},
+    {key:'6',value:'6'},
+    {key:'7',value:'7'},
+    {key:'8',value:'8'},
+    {key:'9',value:'9'},
+    {key:'10',value:'10'},
+    {key:'11',value:'11'},
+    {key:'12',value:'12'},
+    {key:'13',value:'13'},
+    {key:'14',value:'14'},
+    {key:'15',value:'15'},
+    {key:'16',value:'16'},
   ];
 
 type ScreenProps=NativeStackScreenProps<RootStackParamList,"ProfileFormScreen">;
@@ -54,7 +55,6 @@ export default function ProfileFormScreen({route,navigation}:ScreenProps){
             StackActions.replace(screenName)
           );
     }
-
     const saveProfile=async()=>{
         let {error,message}=await saveProfileAPI(name,selectedCurrentLocation,selectedPreferredLocations)
         if(error){

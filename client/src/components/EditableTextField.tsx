@@ -6,7 +6,8 @@ import BottomDrawer, {BottomDrawerMethods} from 'react-native-animated-bottom-dr
 import { getToken } from '../utils/TokenHandler';
 import { RouteProp, StackActions } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../utils/AppNavigator';
+import { RootStackParamList } from '../interfaces/app_interfaces';
+
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import { BACKEND_BASE_URL } from '@env';
@@ -15,7 +16,6 @@ import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-lis
 import { colors } from '../utils/colors';
 import { saveUserLocation, saveUserName, saveUserPreferredLocations } from '../utils/LocalStorageHandler';
 import { AppStyles } from '../utils/AppStyles';
-import { updateProfile } from '../api';
 
 interface EditableTextFieldParams{
     icon:string,
@@ -74,41 +74,38 @@ export default function EditableTextField(input:EditableTextFieldParams){
             bottomDrawerRef.current?.open(150)      
     }
     const SaveProfile=async()=>{
-        let token=await getToken();
         if(token===null){
             goToSignInPage({route,navigation})
         }else{
-            console.log("HERE")
             input.setLoading(true)
             var patchData
             if(input.fieldName==='Name'){
                 patchData={name:newValue};
-                console.log("NAME")
             }else if(input.fieldName==='Location'){
                 patchData={location:newValue};
             }else{
                 patchData={preferredLocations:newValueObj};
             }
             bottomDrawerRef.current?.close()
-            let {error,message}=await updateProfile(patchData);
-            if(error){
-                Toast.show({type:'error',text1:message});
-                goToSignInPage({route,navigation})
-            }else{
-                Toast.show({type:'success',text1:'Saved Profile Successfully',position:'bottom'})
-                input.setLoading(false)
+            axios.patch(`${BACKEND_BASE_URL}/profile`,patchData,{headers:{Authorization:`Bearer ${token}`}})
+            .then(async response=>{
+                console.log(response.data)
                 if(input.fieldName==='Name'){
                     input.setName(newValue)
-                    await saveUserName(newValue)
                 }else if(input.fieldName==='Location'){
                     input.setLocation(newValue)
-                    await saveUserLocation(newValue)
                 }else if(input.fieldName==='Preferred Locations'){
                     input.setPreferredLocations(newValueObj)
-                    await saveUserPreferredLocations(newValueObj)
                     setValueObj([])
                 }
-            }
+                Toast.show({type:'success',text1:'Saved Profile Successfully',position:'bottom'})
+                input.setLoading(false)
+            }).catch((error)=>{
+                let errorData=error.response.data;
+                let {name,message}=getError(errorData);
+                Toast.show({type:'error',text1:message});
+                goToSignInPage({route,navigation})
+            })
         }
     }
     return(

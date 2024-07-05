@@ -110,6 +110,7 @@ export async function signIn(
       if (
         !response.data.data.user.hasOwnProperty("name") ||
         !response.data.data.user.hasOwnProperty("location") ||
+        !response.data.data.user.hasOwnProperty("department") ||
         !response.data.data.user.hasOwnProperty("preferredLocations")
       ) {
         console.log("GO to profile form screen");
@@ -120,6 +121,7 @@ export async function signIn(
           name: response.data.data.user.name,
           email: response.data.data.user.email,
           location: response.data.data.user.location,
+          department: response.data.data.user.department,
           preferredLocations: response.data.data.user.preferredLocations,
           photo: response.data.data.user.hasOwnProperty("photo")
             ? response.data.data.user.photo

@@ -87,9 +87,10 @@ type TabsScreenProps = NativeStackScreenProps<
 export default function ProfileScreen({ route, navigation }: TabsScreenProps) {
   const [name, setName] = useState<string>("");
   const [location, setLocation] = useState<string>("");
+  const [department, setDepartment] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string>();
-  const [department, setDepartment] = useState<string>("");
+
   const [preferredLocations, setPreferredLocations] = useState<string[]>([]);
   const states: profileStates = {
     setName: setName,
@@ -103,7 +104,7 @@ export default function ProfileScreen({ route, navigation }: TabsScreenProps) {
     navigation.dispatch(StackActions.replace("SignIn"));
     navigation.navigate("SignIn");
   };
-
+  console.log(currentUser);
   useEffect(() => {
     getProfile();
   }, [currentUser]);
@@ -119,7 +120,7 @@ export default function ProfileScreen({ route, navigation }: TabsScreenProps) {
       setLocation(currentUser.location);
     }
     if (currentUser && currentUser.department) {
-      setLocation(currentUser.department);
+      setDepartment(currentUser.department);
     }
     if (currentUser && currentUser.email) {
       setEmail(currentUser.email);
@@ -201,6 +202,7 @@ export default function ProfileScreen({ route, navigation }: TabsScreenProps) {
     closeMenu();
     navigation.navigate("ChangePassword");
   };
+  //console.log(department);
   return (
     <View style={AppStyles.container}>
       <PaperProvider>
@@ -283,9 +285,7 @@ export default function ProfileScreen({ route, navigation }: TabsScreenProps) {
           route={route}
           navigation={navigation}
         ></EditableTextField>
-
         <Divider />
-
         <EditableTextField
           icon="map-pin"
           fieldName="Location"
@@ -303,7 +303,6 @@ export default function ProfileScreen({ route, navigation }: TabsScreenProps) {
           navigation={navigation}
         ></EditableTextField>
         <Divider />
-
         <EditableTextField
           icon="map-pin"
           fieldName="Department"
@@ -320,9 +319,7 @@ export default function ProfileScreen({ route, navigation }: TabsScreenProps) {
           route={route}
           navigation={navigation}
         ></EditableTextField>
-
         <Divider />
-
         <EditableTextField
           icon="search-location"
           fieldName="Preferred Locations"
@@ -351,9 +348,7 @@ export default function ProfileScreen({ route, navigation }: TabsScreenProps) {
         ) : (
           <View />
         )}
-
         <Divider />
-
         <EditableTextField
           icon="mail"
           fieldName="Email"
